@@ -112,17 +112,36 @@
         </div>
 
         <div class="d-flex gap-2 mb-4">
-            @if($reportCards->first()->status === 'draft')
-                <form method="POST" action="{{ route('results.computations.approve', [$exam, $class]) }}">
+            @php $firstStatus = $reportCards->first()->status ?? 'draft'; @endphp
+            @if($firstStatus === 'draft')
+                <form method="POST" action="{{ route('results.approvals.bulk-action') }}">
                     @csrf
+                    <input type="hidden" name="exam_id" value="{{ $selectedExam }}">
+                    <input type="hidden" name="school_class_id" value="{{ $selectedClass }}">
+                    <input type="hidden" name="action" value="submit">
+                    <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; border: none; cursor: pointer;">Submit All</button>
+                </form>
+            @endif
+            @if($firstStatus === 'submitted')
+                <form method="POST" action="{{ route('results.approvals.bulk-action') }}">
+                    @csrf
+                    <input type="hidden" name="exam_id" value="{{ $selectedExam }}">
+                    <input type="hidden" name="school_class_id" value="{{ $selectedClass }}">
+                    <input type="hidden" name="action" value="approve">
                     <button type="submit" class="btn" style="background: #fff3cd; color: #664d03; border-radius: 8px; padding: 10px 20px; font-weight: 500; border: none; cursor: pointer;">Approve All</button>
                 </form>
             @endif
-            @if($reportCards->first()->status === 'approved')
-                <form method="POST" action="{{ route('results.computations.publish', [$exam, $class]) }}">
+            @if($firstStatus === 'approved')
+                <form method="POST" action="{{ route('results.approvals.bulk-action') }}">
                     @csrf
+                    <input type="hidden" name="exam_id" value="{{ $selectedExam }}">
+                    <input type="hidden" name="school_class_id" value="{{ $selectedClass }}">
+                    <input type="hidden" name="action" value="publish">
                     <button type="submit" class="btn" style="background: #d1e7dd; color: #0f5132; border-radius: 8px; padding: 10px 20px; font-weight: 500; border: none; cursor: pointer;">Publish All</button>
                 </form>
+            @endif
+            @if(in_array($firstStatus, ['submitted', 'approved', 'published']))
+                <a href="{{ route('results.approvals.dashboard', ['exam_id' => $selectedExam, 'school_class_id' => $selectedClass]) }}" class="btn" style="background: #e7f1ff; color: #0d6efd; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Approval Workflow</a>
             @endif
             <a href="{{ route('results.rankings.class', ['exam_id' => $selectedExam, 'school_class_id' => $selectedClass]) }}" class="btn" style="background: #e7f1ff; color: #0d6efd; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">View Class Rankings</a>
         </div>
@@ -164,6 +183,10 @@
                                             <span style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Published</span>
                                         @elseif($card->status === 'approved')
                                             <span style="background: #fff3cd; color: #664d03; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Approved</span>
+                                        @elseif($card->status === 'submitted')
+                                            <span style="background: #e7f1ff; color: #0d6efd; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Submitted</span>
+                                        @elseif($card->status === 'rejected')
+                                            <span style="background: #f8d7da; color: #842029; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Rejected</span>
                                         @else
                                             <span style="background: #f0f2f5; color: #6c757d; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Draft</span>
                                         @endif

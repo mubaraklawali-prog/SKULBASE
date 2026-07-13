@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Exam;
 use App\Models\SchoolClass;
-use App\Models\Student;
 use App\Models\StudentReportCard;
 use App\Models\StudentResult;
 use App\Models\Subject;
 use App\Services\ResultComputationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ResultComputationController extends Controller
@@ -142,26 +140,18 @@ class ResultComputationController extends Controller
 
     public function approve(Exam $exam, SchoolClass $schoolClass): RedirectResponse
     {
-        $count = $this->computationService->approveResults($exam, $schoolClass);
-
-        return redirect()
-            ->route('results.computations.compute', [
-                'exam_id' => $exam->id,
-                'school_class_id' => $schoolClass->id,
-            ])
-            ->with('success', "{$count} report cards approved.");
+        return redirect()->route('results.approvals.dashboard', [
+            'exam_id' => $exam->id,
+            'school_class_id' => $schoolClass->id,
+        ]);
     }
 
     public function publish(Exam $exam, SchoolClass $schoolClass): RedirectResponse
     {
-        $count = $this->computationService->publishResults($exam, $schoolClass);
-
-        return redirect()
-            ->route('results.computations.compute', [
-                'exam_id' => $exam->id,
-                'school_class_id' => $schoolClass->id,
-            ])
-            ->with('success', "{$count} report cards published.");
+        return redirect()->route('results.approvals.dashboard', [
+            'exam_id' => $exam->id,
+            'school_class_id' => $schoolClass->id,
+        ]);
     }
 
     public function classRanking(Request $request): View
@@ -231,6 +221,7 @@ class ResultComputationController extends Controller
             $rank = 1;
             $rankings = $studentScores->map(function ($item) use (&$rank) {
                 $item['position'] = $rank++;
+
                 return $item;
             });
 

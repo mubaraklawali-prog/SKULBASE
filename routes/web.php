@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AssessmentTypeController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\GradingSystemController;
-use App\Http\Controllers\ResultsController;
-use App\Http\Controllers\ScoreEntryController;
 use App\Http\Controllers\ReportCardController;
+use App\Http\Controllers\ResultApprovalController;
 use App\Http\Controllers\ResultComputationController;
+use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\ScoreEntryController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
@@ -386,5 +387,33 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/results/report-cards/{reportCard}/pdf', [ReportCardController::class, 'downloadPdf'])
             ->name('results.report-cards.pdf');
+
+        // Result Approval Workflow
+        Route::get('/results/approvals', [ResultApprovalController::class, 'dashboard'])
+            ->name('results.approvals.dashboard');
+
+        Route::post('/results/approvals/{reportCard}/submit', [ResultApprovalController::class, 'submit'])
+            ->name('results.approvals.submit');
+
+        Route::post('/results/approvals/{reportCard}/approve', [ResultApprovalController::class, 'approve'])
+            ->name('results.approvals.approve');
+
+        Route::post('/results/approvals/{reportCard}/publish', [ResultApprovalController::class, 'publish'])
+            ->name('results.approvals.publish');
+
+        Route::post('/results/approvals/{reportCard}/unpublish', [ResultApprovalController::class, 'unpublish'])
+            ->name('results.approvals.unpublish');
+
+        Route::post('/results/approvals/{reportCard}/reject', [ResultApprovalController::class, 'reject'])
+            ->name('results.approvals.reject');
+
+        Route::post('/results/approvals/{reportCard}/revert', [ResultApprovalController::class, 'revertToDraft'])
+            ->name('results.approvals.revert');
+
+        Route::post('/results/approvals/bulk', [ResultApprovalController::class, 'bulkAction'])
+            ->name('results.approvals.bulk-action');
+
+        Route::get('/results/approvals/reports', [ResultApprovalController::class, 'reports'])
+            ->name('results.approvals.reports');
     });
 });
