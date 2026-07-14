@@ -45,4 +45,9 @@ class Subject extends Model
     {
         return $this->hasMany(Timetable::class);
     }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
 }

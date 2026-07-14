@@ -1,14 +1,20 @@
 <?php
 
+use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AssessmentTypeController;
+use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\GradingSystemController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ParentTimetableController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\ReportCardController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResultApprovalController;
 use App\Http\Controllers\ResultComputationController;
 use App\Http\Controllers\ResultsController;
@@ -36,6 +42,12 @@ Route::middleware('guest')->group(function () {
         ->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
+
+// Public Admission Form
+Route::get('/admissions/apply', [AdmissionController::class, 'form'])
+    ->name('admissions.form');
+Route::post('/admissions/apply', [AdmissionController::class, 'submit'])
+    ->name('admissions.submit');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])
@@ -486,6 +498,203 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/results/approvals/reports', [ResultApprovalController::class, 'reports'])
             ->name('results.approvals.reports');
+    });
+
+    // Assignments (Super Admin, School Admin, and Teachers)
+    Route::middleware('role:super_admin,school_admin,teacher')->group(function () {
+        Route::get('/assignments', [AssignmentController::class, 'index'])
+            ->name('assignments.index');
+
+        Route::get('/assignments/create', [AssignmentController::class, 'create'])
+            ->name('assignments.create');
+
+        Route::post('/assignments', [AssignmentController::class, 'store'])
+            ->name('assignments.store');
+
+        Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])
+            ->name('assignments.show');
+
+        Route::get('/assignments/{assignment}/edit', [AssignmentController::class, 'edit'])
+            ->name('assignments.edit');
+
+        Route::put('/assignments/{assignment}', [AssignmentController::class, 'update'])
+            ->name('assignments.update');
+
+        Route::delete('/assignments/{assignment}', [AssignmentController::class, 'destroy'])
+            ->name('assignments.destroy');
+    });
+
+    // Announcements
+    Route::get('/announcements', [AnnouncementController::class, 'index'])
+        ->name('announcements.index');
+
+    Route::middleware('role:super_admin,school_admin')->group(function () {
+        Route::get('/announcements/create', [AnnouncementController::class, 'create'])
+            ->name('announcements.create');
+
+        Route::post('/announcements', [AnnouncementController::class, 'store'])
+            ->name('announcements.store');
+
+        Route::get('/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])
+            ->name('announcements.edit');
+
+        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->name('announcements.update');
+
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
+    });
+
+    Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])
+        ->name('announcements.show');
+
+    // Messages
+    Route::get('/messages', [MessageController::class, 'inbox'])
+        ->name('messages.inbox');
+
+    Route::get('/messages/sent', [MessageController::class, 'sent'])
+        ->name('messages.sent');
+
+    Route::get('/messages/compose', [MessageController::class, 'create'])
+        ->name('messages.create');
+
+    Route::post('/messages', [MessageController::class, 'store'])
+        ->name('messages.store');
+
+    Route::get('/messages/{message}', [MessageController::class, 'show'])
+        ->name('messages.show');
+
+    Route::delete('/messages/{message}', [MessageController::class, 'destroy'])
+        ->name('messages.destroy');
+
+    // Events
+    Route::get('/events', [EventController::class, 'index'])
+        ->name('events.index');
+
+    Route::middleware('role:super_admin,school_admin')->group(function () {
+        Route::get('/events/create', [EventController::class, 'create'])
+            ->name('events.create');
+
+        Route::post('/events', [EventController::class, 'store'])
+            ->name('events.store');
+
+        Route::get('/events/{event}/edit', [EventController::class, 'edit'])
+            ->name('events.edit');
+
+        Route::put('/events/{event}', [EventController::class, 'update'])
+            ->name('events.update');
+
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])
+            ->name('events.destroy');
+    });
+
+    Route::get('/events/{event}', [EventController::class, 'show'])
+        ->name('events.show');
+
+    // Admissions (Super Admin, School Admin)
+    Route::middleware('role:super_admin,school_admin')->group(function () {
+        Route::get('/admissions', [AdmissionController::class, 'index'])
+            ->name('admissions.index');
+
+        Route::get('/admissions/{admission}', [AdmissionController::class, 'show'])
+            ->name('admissions.show');
+
+        Route::get('/admissions/{admission}/edit', [AdmissionController::class, 'edit'])
+            ->name('admissions.edit');
+
+        Route::put('/admissions/{admission}', [AdmissionController::class, 'update'])
+            ->name('admissions.update');
+
+        Route::delete('/admissions/{admission}', [AdmissionController::class, 'destroy'])
+            ->name('admissions.destroy');
+
+        Route::post('/admissions/{admission}/approve', [AdmissionController::class, 'approve'])
+            ->name('admissions.approve');
+
+        Route::post('/admissions/{admission}/reject', [AdmissionController::class, 'reject'])
+            ->name('admissions.reject');
+    });
+
+    // ── Reports & Analytics ───────────────────────────────
+    Route::middleware('role:super_admin,school_admin')->prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'dashboard'])
+            ->name('dashboard');
+
+        // Student Reports
+        Route::get('/students', [ReportController::class, 'studentList'])
+            ->name('students.list');
+        Route::get('/students/by-class', [ReportController::class, 'studentsByClass'])
+            ->name('students.by-class');
+        Route::get('/students/status', [ReportController::class, 'studentStatus'])
+            ->name('students.status');
+
+        // Teacher Reports
+        Route::get('/teachers', [ReportController::class, 'teacherList'])
+            ->name('teachers.list');
+        Route::get('/teachers/by-subject', [ReportController::class, 'teachersBySubject'])
+            ->name('teachers.by-subject');
+        Route::get('/teachers/status', [ReportController::class, 'teacherStatus'])
+            ->name('teachers.status');
+
+        // Attendance Reports
+        Route::get('/attendance/summary', [ReportController::class, 'attendanceSummary'])
+            ->name('attendance.summary');
+        Route::get('/attendance/by-date', [ReportController::class, 'attendanceByDate'])
+            ->name('attendance.by-date');
+        Route::get('/attendance/by-class', [ReportController::class, 'attendanceByClass'])
+            ->name('attendance.by-class');
+
+        // Fee Reports
+        Route::get('/fees/payments', [ReportController::class, 'paymentHistory'])
+            ->name('fees.payments');
+        Route::get('/fees/outstanding', [ReportController::class, 'outstandingFees'])
+            ->name('fees.outstanding');
+        Route::get('/fees/collected', [ReportController::class, 'feesCollectedByDate'])
+            ->name('fees.collected');
+
+        // Academic Reports
+        Route::get('/academic/results', [ReportController::class, 'resultsSummary'])
+            ->name('academic.results');
+        Route::get('/academic/class-performance', [ReportController::class, 'classPerformance'])
+            ->name('academic.class-performance');
+        Route::get('/academic/subject-performance', [ReportController::class, 'subjectPerformance'])
+            ->name('academic.subject-performance');
+
+        // PDF Exports
+        Route::get('/export/students/pdf', [ReportController::class, 'exportStudentListPdf'])
+            ->name('export.students.pdf');
+        Route::get('/export/teachers/pdf', [ReportController::class, 'exportTeacherListPdf'])
+            ->name('export.teachers.pdf');
+        Route::get('/export/attendance/pdf', [ReportController::class, 'exportAttendanceSummaryPdf'])
+            ->name('export.attendance.pdf');
+        Route::get('/export/payments/pdf', [ReportController::class, 'exportPaymentHistoryPdf'])
+            ->name('export.payments.pdf');
+        Route::get('/export/outstanding/pdf', [ReportController::class, 'exportOutstandingPdf'])
+            ->name('export.outstanding.pdf');
+        Route::get('/export/results/pdf', [ReportController::class, 'exportResultsSummaryPdf'])
+            ->name('export.results.pdf');
+        Route::get('/export/class-performance/pdf', [ReportController::class, 'exportClassPerformancePdf'])
+            ->name('export.class-performance.pdf');
+        Route::get('/export/subject-performance/pdf', [ReportController::class, 'exportSubjectPerformancePdf'])
+            ->name('export.subject-performance.pdf');
+
+        // CSV Exports
+        Route::get('/export/students/csv', [ReportController::class, 'exportStudentListCsv'])
+            ->name('export.students.csv');
+        Route::get('/export/teachers/csv', [ReportController::class, 'exportTeacherListCsv'])
+            ->name('export.teachers.csv');
+        Route::get('/export/attendance/csv', [ReportController::class, 'exportAttendanceSummaryCsv'])
+            ->name('export.attendance.csv');
+        Route::get('/export/payments/csv', [ReportController::class, 'exportPaymentHistoryCsv'])
+            ->name('export.payments.csv');
+        Route::get('/export/outstanding/csv', [ReportController::class, 'exportOutstandingCsv'])
+            ->name('export.outstanding.csv');
+        Route::get('/export/results/csv', [ReportController::class, 'exportResultsSummaryCsv'])
+            ->name('export.results.csv');
+        Route::get('/export/class-performance/csv', [ReportController::class, 'exportClassPerformancePdfDirect'])
+            ->name('export.class-performance.csv');
+        Route::get('/export/subject-performance/csv', [ReportController::class, 'exportSubjectPerformanceCsv'])
+            ->name('export.subject-performance.csv');
     });
 
     // Teacher Routes

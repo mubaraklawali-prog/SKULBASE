@@ -60,4 +60,14 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Timetable::class, 'class_id');
     }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class, 'class_id');
+    }
+
+    public function admissions(): HasMany
+    {
+        return $this->hasMany(Admission::class, 'class_id');
+    }
 }

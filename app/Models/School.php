@@ -99,8 +99,33 @@ class School extends Model
         return $this->hasMany(Timetable::class);
     }
 
-   public function parents(): HasMany
-{
-    return $this->hasMany(ParentModel::class);
-}
+    public function parents(): HasMany
+    {
+        return $this->hasMany(ParentModel::class);
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function admissions(): HasMany
+    {
+        return $this->hasMany(Admission::class);
+    }
 }
