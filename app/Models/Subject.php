@@ -40,4 +40,9 @@ class Subject extends Model
     {
         return $this->hasMany(StudentResult::class);
     }
+
+    public function timetables(): HasMany
+    {
+        return $this->hasMany(Timetable::class);
+    }
 }

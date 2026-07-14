@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\GradingSystemController;
+use App\Http\Controllers\ParentTimetableController;
+use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\ReportCardController;
 use App\Http\Controllers\ResultApprovalController;
 use App\Http\Controllers\ResultComputationController;
@@ -14,8 +16,11 @@ use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ScoreEntryController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TeacherTimetableController;
+use App\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -372,6 +377,72 @@ Route::middleware('auth')->group(function () {
         Route::get('/results/analytics', [ResultComputationController::class, 'analytics'])
             ->name('results.analytics');
 
+        // Periods
+        Route::get('/periods', [PeriodController::class, 'index'])
+            ->name('periods.index');
+
+        Route::get('/periods/create', [PeriodController::class, 'create'])
+            ->name('periods.create');
+
+        Route::post('/periods', [PeriodController::class, 'store'])
+            ->name('periods.store');
+
+        Route::get('/periods/{period}', [PeriodController::class, 'show'])
+            ->name('periods.show');
+
+        Route::get('/periods/{period}/edit', [PeriodController::class, 'edit'])
+            ->name('periods.edit');
+
+        Route::put('/periods/{period}', [PeriodController::class, 'update'])
+            ->name('periods.update');
+
+        Route::delete('/periods/{period}', [PeriodController::class, 'destroy'])
+            ->name('periods.destroy');
+
+        Route::patch('/periods/{period}/toggle-status', [PeriodController::class, 'toggleStatus'])
+            ->name('periods.toggle-status');
+
+        // Timetables
+        Route::get('/timetables', [TimetableController::class, 'index'])
+            ->name('timetables.index');
+
+        Route::get('/timetables/create', [TimetableController::class, 'create'])
+            ->name('timetables.create');
+
+        Route::post('/timetables', [TimetableController::class, 'store'])
+            ->name('timetables.store');
+
+        Route::get('/timetables/{timetable}/edit', [TimetableController::class, 'edit'])
+            ->name('timetables.edit');
+
+        Route::put('/timetables/{timetable}', [TimetableController::class, 'update'])
+            ->name('timetables.update');
+
+        Route::delete('/timetables/{timetable}', [TimetableController::class, 'destroy'])
+            ->name('timetables.destroy');
+
+        Route::get('/timetables/grid', [TimetableController::class, 'grid'])
+            ->name('timetables.grid');
+
+        Route::get('/timetables/print', [TimetableController::class, 'print'])
+            ->name('timetables.print');
+
+        // Timetable API (AJAX dropdowns)
+        Route::get('/timetables/api/sections', [TimetableController::class, 'getSections'])
+            ->name('timetables.api.sections');
+
+        Route::get('/timetables/api/subjects', [TimetableController::class, 'getSubjects'])
+            ->name('timetables.api.subjects');
+
+        Route::get('/timetables/api/teachers', [TimetableController::class, 'getTeachers'])
+            ->name('timetables.api.teachers');
+
+        Route::get('/timetables/api/periods', [TimetableController::class, 'getPeriods'])
+            ->name('timetables.api.periods');
+
+        Route::get('/timetables/api/classes', [TimetableController::class, 'getClassesBySchool'])
+            ->name('timetables.api.classes');
+
         // Report Cards
         Route::get('/results/report-cards', [ReportCardController::class, 'bulkSelector'])
             ->name('results.report-cards.bulk');
@@ -415,5 +486,32 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/results/approvals/reports', [ResultApprovalController::class, 'reports'])
             ->name('results.approvals.reports');
+    });
+
+    // Teacher Routes
+    Route::middleware('role:teacher')->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('/timetable', [TeacherTimetableController::class, 'index'])
+            ->name('timetable.index');
+
+        Route::get('/timetable/print', [TeacherTimetableController::class, 'print'])
+            ->name('timetable.print');
+    });
+
+    // Student Routes
+    Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
+        Route::get('/timetable', [StudentTimetableController::class, 'index'])
+            ->name('timetable.index');
+
+        Route::get('/timetable/print', [StudentTimetableController::class, 'print'])
+            ->name('timetable.print');
+    });
+
+    // Parent Routes
+    Route::middleware('role:parent')->prefix('parent')->name('parent.')->group(function () {
+        Route::get('/timetable', [ParentTimetableController::class, 'index'])
+            ->name('timetable.index');
+
+        Route::get('/timetable/print', [ParentTimetableController::class, 'print'])
+            ->name('timetable.print');
     });
 });

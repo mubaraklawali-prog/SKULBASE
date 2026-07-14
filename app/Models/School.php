@@ -88,4 +88,19 @@ class School extends Model
     {
         return $this->hasMany(StudentReportCard::class);
     }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class);
+    }
+
+    public function timetables(): HasMany
+    {
+        return $this->hasMany(Timetable::class);
+    }
+
+    public function parents(): HasMany
+    {
+        return $this->hasMany(ParentModel::class);
+    }
 }

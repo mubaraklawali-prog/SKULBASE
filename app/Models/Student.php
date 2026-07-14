@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
@@ -20,6 +21,7 @@ class Student extends Model
         'address',
         'class',
         'school_class_id',
+        'section_id',
         'status',
     ];
 
@@ -35,6 +37,16 @@ class Student extends Model
     public function schoolClass(): BelongsTo
     {
         return $this->belongsTo(SchoolClass::class, 'school_class_id');
+    }
+
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+    public function parents(): BelongsToMany
+    {
+        return $this->belongsToMany(ParentModel::class, 'parent_student');
     }
 
     public function getFullNameAttribute(): string

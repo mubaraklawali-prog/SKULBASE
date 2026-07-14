@@ -106,6 +106,41 @@
             opacity: 1;
         }
 
+        .sidebar-nav .nav-parent .nav-link {
+            cursor: pointer;
+        }
+
+        .sidebar-nav .nav-parent .nav-link .chevron {
+            margin-left: auto;
+            transition: transform 0.2s;
+            width: 14px;
+            height: 14px;
+            opacity: 0.5;
+        }
+
+        .sidebar-nav .nav-parent.open .nav-link .chevron {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-nav .submenu {
+            display: none;
+            padding-left: 24px;
+        }
+
+        .sidebar-nav .nav-parent.open .submenu {
+            display: block;
+        }
+
+        .sidebar-nav .submenu .nav-link {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .sidebar-nav .submenu .nav-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
         .main-content {
             margin-left: var(--sidebar-width);
             margin-top: 64px;
@@ -489,13 +524,142 @@
                         Approvals
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
+                @php $userRole = auth()->user()->role ?? ''; @endphp
+                @if(in_array($userRole, ['super_admin', 'school_admin']))
+                <li class="nav-item nav-parent {{ request()->routeIs('timetables.*') || request()->routeIs('periods.*') ? 'open' : '' }}">
+                    <a class="nav-link {{ request()->routeIs('timetables.*') || request()->routeIs('periods.*') ? 'active' : '' }}" onclick="this.parentElement.classList.toggle('open'); return false;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Academic
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('timetables.index') ? 'active' : '' }}" href="{{ route('timetables.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                Timetables
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('timetables.grid') ? 'active' : '' }}" href="{{ route('timetables.grid') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                                Weekly Grid
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('periods.*') ? 'active' : '' }}" href="{{ route('periods.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Periods
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+                @if($userRole === 'teacher')
+                <li class="nav-item nav-parent {{ request()->routeIs('teacher.timetable.*') ? 'open' : '' }}">
+                    <a class="nav-link {{ request()->routeIs('teacher.timetable.*') ? 'active' : '' }}" onclick="this.parentElement.classList.toggle('open'); return false;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Academic
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('teacher.timetable.*') ? 'active' : '' }}" href="{{ route('teacher.timetable.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                                My Timetable
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+                @if($userRole === 'student')
+                <li class="nav-item nav-parent {{ request()->routeIs('student.timetable.*') ? 'open' : '' }}">
+                    <a class="nav-link {{ request()->routeIs('student.timetable.*') ? 'active' : '' }}" onclick="this.parentElement.classList.toggle('open'); return false;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Academic
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('student.timetable.*') ? 'active' : '' }}" href="{{ route('student.timetable.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                                My Timetable
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+                @if($userRole === 'parent')
+                <li class="nav-item nav-parent {{ request()->routeIs('parent.timetable.*') ? 'open' : '' }}">
+                    <a class="nav-link {{ request()->routeIs('parent.timetable.*') ? 'active' : '' }}" onclick="this.parentElement.classList.toggle('open'); return false;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        Parents
+                        Children
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('parent.timetable.*') ? 'active' : '' }}" href="{{ route('parent.timetable.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                                My Child Timetable
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+                <li class="nav-item">
                     </a>
                 </li>
                 <li class="nav-item">

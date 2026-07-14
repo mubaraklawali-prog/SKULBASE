@@ -51,10 +51,10 @@ class Teacher extends Model
 
     public function getFullNameAttribute(): string
     {
-        $name = $this->first_name . ' ' . $this->last_name;
+        $name = $this->first_name.' '.$this->last_name;
 
         if ($this->other_name) {
-            $name = $this->first_name . ' ' . $this->other_name . ' ' . $this->last_name;
+            $name = $this->first_name.' '.$this->other_name.' '.$this->last_name;
         }
 
         return $name;
@@ -62,8 +62,8 @@ class Teacher extends Model
 
     public function getPhotoUrlAttribute(): string
     {
-        if ($this->photo && file_exists(storage_path('app/public/' . $this->photo))) {
-            return asset('storage/' . $this->photo);
+        if ($this->photo && file_exists(storage_path('app/public/'.$this->photo))) {
+            return asset('storage/'.$this->photo);
         }
 
         return asset('storage/defaults/avatar.png');
@@ -72,5 +72,10 @@ class Teacher extends Model
     public function studentResults(): HasMany
     {
         return $this->hasMany(StudentResult::class);
+    }
+
+    public function timetables(): HasMany
+    {
+        return $this->hasMany(Timetable::class);
     }
 }
