@@ -21,6 +21,7 @@ use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ScoreEntryController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\SubjectController;
@@ -722,5 +723,14 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/timetable/print', [ParentTimetableController::class, 'print'])
             ->name('timetable.print');
+    });
+
+    // Settings
+    Route::middleware('role:super_admin,school_admin')->group(function () {
+        Route::get('/settings', [SettingsController::class, 'index'])
+            ->name('settings.index');
+
+        Route::put('/settings', [SettingsController::class, 'update'])
+            ->name('settings.update');
     });
 });
