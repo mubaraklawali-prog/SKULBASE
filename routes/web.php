@@ -181,9 +181,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/attendance', [AttendanceController::class, 'store'])
             ->name('attendance.store');
 
-        Route::get('/attendance/{attendance}', [AttendanceController::class, 'show'])
-            ->name('attendance.show');
-
         Route::get('/attendance/student/{student}', [AttendanceController::class, 'studentAttendance'])
             ->name('attendance.student');
 
@@ -198,6 +195,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/attendance/monthly-report/{schoolClass}', [AttendanceController::class, 'monthlyReport'])
             ->name('attendance.monthly-report.show');
+
+        Route::get('/attendance/{attendance}', [AttendanceController::class, 'show'])
+            ->name('attendance.show');
 
         // Fees
         Route::get('/fees', [FeeController::class, 'dashboard'])

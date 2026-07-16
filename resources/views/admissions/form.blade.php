@@ -138,6 +138,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const oldClassId = "{{ old('class_id') }}";
+
         document.addEventListener('DOMContentLoaded', function() {
             const schoolSelect = document.querySelector('select[name="school_id"]');
             const classSection = document.getElementById('classSection');
@@ -165,7 +167,8 @@
                     .then(data => {
                         classSelect.innerHTML = '<option value="">Select class...</option>';
                         data.forEach(cls => {
-                            classSelect.innerHTML += `<option value="${cls.id}" {{ old('class_id') == cls.id ? 'selected' : '' }}>${cls.name}</option>`;
+                            const selected = oldClassId == cls.id ? "selected" : "";
+                            classSelect.innerHTML += `<option value="${cls.id}" ${selected}>${cls.name}</option>`;
                         });
                     })
                     .catch(() => {

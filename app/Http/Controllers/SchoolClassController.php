@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\School;
 use App\Models\SchoolClass;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -53,15 +54,19 @@ class SchoolClassController extends Controller
 
     public function show(SchoolClass $schoolClass): View
     {
-        $schoolClass->load('school');
-        $schoolClass->loadCount('students');
+        $schoolClass->load([
+            'school',
+            'students.school',
+        ])->loadCount('students');
 
         $students = $schoolClass->students()
-            ->with('school')
             ->latest()
             ->paginate(10);
 
-        return view('classes.show', compact('schoolClass', 'students'));
+        return view('classes.show', compact(
+            'schoolClass',
+            'students'
+        ));
     }
 
     public function edit(SchoolClass $schoolClass): View
@@ -108,5 +113,16 @@ class SchoolClassController extends Controller
         return redirect()
             ->route('classes.index')
             ->with('success', "Class {$status} successfully.");
+    }
+
+    public function classesBySchool(int $schoolId): JsonResponse
+    {
+        $classes = SchoolClass::where('school_id', $schoolId)
+            ->where('status', true)
+            ->orderBy('name')
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($classes);
     }
 }
