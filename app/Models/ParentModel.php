@@ -51,7 +51,7 @@ class ParentModel extends Model
             'parent_student',
             'parent_id',
             'student_id'
-        );
+        )->withTimestamps();
     }
 
     /**
@@ -59,6 +59,6 @@ class ParentModel extends Model
      */
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name . ' ' . $this->last_name);
+        return trim($this->first_name.' '.$this->last_name);
     }
 }

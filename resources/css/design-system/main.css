@@ -1,0 +1,31 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — MAIN ENTRY POINT
+   Import order matters. Variables must load first.
+   ========================================================================== */
+
+/* 1. Design Tokens — colors, typography, spacing, radius, shadows */
+@import './variables.css';
+
+/* 2. Typography — font family, scale, weight classes */
+@import './typography.css';
+
+/* 3. Spacing — margin, padding, gap utilities */
+@import './spacing.css';
+
+/* 4. Border Radius — rounded corner utilities */
+@import './radius.css';
+
+/* 5. Shadows — elevation and depth utilities */
+@import './shadows.css';
+
+/* 6. Animations — transitions, keyframes, motion */
+@import './animations.css';
+
+/* 7. Component Tokens — buttons, cards, forms, tables, etc. */
+@import './components.css';
+
+/* 8. Utilities — display, flex, text, background, etc. */
+@import './utilities.css';
+
+/* 9. Responsive — breakpoints, hidden/visible, mobile adjustments */
+@import './responsive.css';

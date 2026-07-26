@@ -70,7 +70,7 @@
     }
     .lesson-card {
         background: #f0f7ff;
-        border-left: 3px solid #4f9cf7;
+        border-left: 3px solid var(--primary);
         border-radius: 6px;
         padding: 8px 10px;
     }
@@ -147,8 +147,7 @@
         <div class="d-flex gap-2">
             <a href="{{ route('teacher.timetable.print') }}"
                target="_blank"
-               class="btn"
-               style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+               class="sb-btn sb-btn-outline-secondary d-inline-flex align-items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
                     <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>

@@ -17,7 +17,7 @@ class UpdateAnnouncementRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string'],
             'audience' => ['required', 'in:everyone,teachers,students,parents'],
-            'attachment' => ['nullable', 'file', 'max:10240'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip', 'max:10240'],
             'status' => ['sometimes', 'in:draft,published'],
             'expires_at' => ['nullable', 'date'],
         ];

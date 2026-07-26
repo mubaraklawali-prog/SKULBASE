@@ -10,10 +10,20 @@ use Illuminate\View\View;
 
 class AssessmentTypeController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function index(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $assessmentTypes = AssessmentType::query()
             ->with('school')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
@@ -26,7 +36,8 @@ class AssessmentTypeController extends Controller
 
     public function create(): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.assessment-types.create', compact('schools'));
     }
@@ -50,7 +61,8 @@ class AssessmentTypeController extends Controller
 
     public function edit(AssessmentType $assessmentType): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.assessment-types.edit', compact('assessmentType', 'schools'));
     }
@@ -73,6 +85,10 @@ class AssessmentTypeController extends Controller
 
     public function destroy(AssessmentType $assessmentType): RedirectResponse
     {
+        if ($assessmentType->studentResults()->exists()) {
+            return back()->with('error', 'Cannot delete this assessment type because it is still used in student results. Remove all associated results first.');
+        }
+
         $assessmentType->delete();
 
         return redirect()

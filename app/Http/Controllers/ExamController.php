@@ -10,10 +10,20 @@ use Illuminate\View\View;
 
 class ExamController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function index(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $exams = Exam::query()
             ->with('school')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('term', 'like', "%{$search}%")
@@ -28,7 +38,8 @@ class ExamController extends Controller
 
     public function create(): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.exams.create', compact('schools'));
     }
@@ -55,7 +66,8 @@ class ExamController extends Controller
 
     public function edit(Exam $exam): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.exams.edit', compact('exam', 'schools'));
     }
@@ -81,6 +93,10 @@ class ExamController extends Controller
 
     public function destroy(Exam $exam): RedirectResponse
     {
+        if ($exam->studentResults()->exists()) {
+            return back()->with('error', 'Cannot delete this exam because it has associated student results. Remove all results first.');
+        }
+
         $exam->delete();
 
         return redirect()

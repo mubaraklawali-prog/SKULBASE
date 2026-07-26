@@ -6,17 +6,23 @@ use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class TeacherController extends Controller
 {
     public function index(Request $request): View
     {
+        $user = auth()->user();
+
         $teachers = Teacher::query()
             ->with('school')
+            ->when($user->role !== 'super_admin' && $user->school_id, fn ($q) => $q->where('teachers.school_id', $user->school_id))
             ->when($request->search, function ($query, $search) {
                 $query->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
@@ -32,15 +38,27 @@ class TeacherController extends Controller
 
     public function create(): View
     {
-        $schools = School::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
-        $schoolClasses = SchoolClass::orderBy('name')->get();
+        $user = auth()->user();
+
+        $schools = $user->role === 'super_admin'
+            ? School::orderBy('name')->get()
+            : School::where('id', $user->school_id)->get();
+
+        $subjects = $user->role === 'super_admin'
+            ? Subject::orderBy('name')->get()
+            : Subject::where('school_id', $user->school_id)->orderBy('name')->get();
+
+        $schoolClasses = $user->role === 'super_admin'
+            ? SchoolClass::orderBy('name')->get()
+            : SchoolClass::where('school_id', $user->school_id)->orderBy('name')->get();
 
         return view('teachers.create', compact('schools', 'subjects', 'schoolClasses'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'first_name' => 'required|string|max:255',
@@ -57,15 +75,25 @@ class TeacherController extends Controller
             'subjects.*' => 'exists:subjects,id',
             'school_classes' => 'nullable|array',
             'school_classes.*' => 'exists:school_classes,id',
+            'can_mark_attendance' => 'nullable',
+            'create_login_account' => 'nullable',
         ]);
 
+        if ($user->role !== 'super_admin') {
+            abort_if((int) $validated['school_id'] !== (int) $user->school_id, 403, 'Unauthorized access.');
+            $validated['school_id'] = $user->school_id;
+        }
+
         $validated['status'] = true;
+        $validated['can_mark_attendance'] = $request->boolean('can_mark_attendance');
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('teachers', 'public');
         }
 
-        unset($validated['subjects'], $validated['school_classes']);
+        $createAccount = $request->boolean('create_login_account');
+
+        unset($validated['subjects'], $validated['school_classes'], $validated['create_login_account']);
 
         $teacher = Teacher::create($validated);
 
@@ -77,9 +105,46 @@ class TeacherController extends Controller
             $teacher->schoolClasses()->sync($request->school_classes);
         }
 
+        if ($createAccount && $teacher->email) {
+            $password = Str::random(12);
+
+            $teacherUser = User::forceCreate([
+                'name' => $teacher->full_name,
+                'email' => $teacher->email,
+                'password' => Hash::make($password),
+                'force_password_change' => true,
+            ]);
+
+            $teacherUser->forceFill([
+                'role' => 'teacher',
+                'school_id' => $teacher->school_id,
+            ])->save();
+
+            $teacher->update(['user_id' => $teacherUser->id]);
+
+            return redirect()
+                ->route('teachers.credentials', $teacher)
+                ->with('credentials', [
+                    'name' => $teacher->email,
+                    'password' => $password,
+                ]);
+        }
+
         return redirect()
             ->route('teachers.index')
             ->with('success', 'Teacher created successfully.');
+    }
+
+    public function credentials(Teacher $teacher): View
+    {
+        $credentials = session('credentials');
+
+        abort_unless($credentials, 404);
+
+        return view('teachers.create-credentials', [
+            'teacher' => $teacher,
+            'credentials' => $credentials,
+        ]);
     }
 
     public function show(Teacher $teacher): View
@@ -91,9 +156,20 @@ class TeacherController extends Controller
 
     public function edit(Teacher $teacher): View
     {
-        $schools = School::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
-        $schoolClasses = SchoolClass::orderBy('name')->get();
+        $user = auth()->user();
+
+        $schools = $user->role === 'super_admin'
+            ? School::orderBy('name')->get()
+            : School::where('id', $user->school_id)->get();
+
+        $subjects = $user->role === 'super_admin'
+            ? Subject::orderBy('name')->get()
+            : Subject::where('school_id', $user->school_id)->orderBy('name')->get();
+
+        $schoolClasses = $user->role === 'super_admin'
+            ? SchoolClass::orderBy('name')->get()
+            : SchoolClass::where('school_id', $user->school_id)->orderBy('name')->get();
+
         $assignedSubjectIds = $teacher->subjects->pluck('id')->toArray();
         $assignedClassIds = $teacher->schoolClasses->pluck('id')->toArray();
 
@@ -102,6 +178,8 @@ class TeacherController extends Controller
 
     public function update(Request $request, Teacher $teacher): RedirectResponse
     {
+        $user = auth()->user();
+
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'first_name' => 'required|string|max:255',
@@ -119,7 +197,15 @@ class TeacherController extends Controller
             'subjects.*' => 'exists:subjects,id',
             'school_classes' => 'nullable|array',
             'school_classes.*' => 'exists:school_classes,id',
+            'can_mark_attendance' => 'nullable',
         ]);
+
+        if ($user->role !== 'super_admin') {
+            abort_if((int) $validated['school_id'] !== (int) $user->school_id, 403, 'Unauthorized access.');
+            $validated['school_id'] = $user->school_id;
+        }
+
+        $validated['can_mark_attendance'] = $request->boolean('can_mark_attendance');
 
         if ($request->hasFile('photo')) {
             if ($teacher->photo) {
@@ -142,6 +228,14 @@ class TeacherController extends Controller
 
     public function destroy(Teacher $teacher): RedirectResponse
     {
+        if ($teacher->assignments()->exists()) {
+            return back()->with('error', 'Cannot delete this teacher because they have assigned tasks. Remove all assignments first.');
+        }
+
+        if ($teacher->studentResults()->exists()) {
+            return back()->with('error', 'Cannot delete this teacher because they have recorded student results. Remove all results first.');
+        }
+
         if ($teacher->photo) {
             Storage::disk('public')->delete($teacher->photo);
         }

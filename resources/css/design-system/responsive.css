@@ -1,0 +1,439 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — RESPONSIVE
+   Breakpoint-specific adjustments and responsive utilities.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------
+   BREAKPOINTS (reference — used in media queries below)
+   Mobile:   < 576px    (default)
+   Tablet:   >= 576px   (sm)
+   Laptop:   >= 768px   (md)
+   Desktop:  >= 992px   (lg)
+   Wide:     >= 1200px  (xl)
+   Ultra:    >= 1400px  (xxl)
+   --------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------
+   RESPONSIVE CONTAINER
+   --------------------------------------------------------------- */
+.sb-container {
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--page-padding);
+    padding-right: var(--page-padding);
+}
+
+@media (max-width: 575.98px) {
+    .sb-container {
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE TYPOGRAPHY SCALE
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .sb-text-display { font-size: var(--font-size-3xl); }
+    .sb-text-h1      { font-size: var(--font-size-3xl); }
+    .sb-text-h2      { font-size: var(--font-size-2xl); }
+    .sb-text-h3      { font-size: var(--font-size-xl); }
+
+    .sb-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 575.98px) {
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE SPACING
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    :root {
+        --page-padding: var(--space-4);
+    }
+
+    .sb-p-responsive {
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
+    }
+}
+
+@media (min-width: 768px) {
+    .sb-p-responsive {
+        padding-left: var(--space-6);
+        padding-right: var(--space-6);
+    }
+}
+
+@media (min-width: 1200px) {
+    .sb-p-responsive {
+        padding-left: var(--space-8);
+        padding-right: var(--space-8);
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE GRID
+   --------------------------------------------------------------- */
+.sb-grid {
+    display: grid;
+    gap: var(--space-6);
+}
+
+.sb-grid-1 { grid-template-columns: 1fr; }
+.sb-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.sb-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.sb-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 575.98px) {
+    .sb-grid-2,
+    .sb-grid-3,
+    .sb-grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .sb-grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .sb-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE TABLE (Card Layout on Mobile)
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .sb-table-responsive thead {
+        display: none;
+    }
+
+    .sb-table-responsive tbody tr {
+        display: block;
+        padding: var(--space-3) var(--space-4);
+        margin-bottom: var(--space-2);
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+    }
+
+    .sb-table-responsive tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-2) 0;
+        border-bottom: 1px solid var(--divider);
+        font-size: var(--font-size-sm);
+        text-align: right;
+    }
+
+    .sb-table-responsive tbody td:last-child {
+        border-bottom: none;
+    }
+
+    .sb-table-responsive tbody td::before {
+        content: attr(data-label);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-heading);
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: left;
+        min-width: 30%;
+    }
+
+    .sb-table-responsive tbody td.text-end {
+        text-align: right;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE SIDEBAR
+   --------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+    .sb-sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--duration-normal) var(--ease-default);
+    }
+
+    .sb-sidebar.show {
+        transform: translateX(0);
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE FORMS
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .sb-form-row {
+        flex-direction: column;
+    }
+    .sb-form-row .col,
+    .sb-form-row [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .sb-input,
+    .sb-select,
+    .sb-textarea {
+        font-size: 16px;
+    }
+
+    .sb-search-bar {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .sb-search-bar .sb-input,
+    .sb-search-bar .sb-btn,
+    .sb-search-bar .sb-btn-ghost {
+        width: 100%;
+    }
+
+    .sb-search-bar .sb-btn {
+        justify-content: center;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE PAGINATION
+   --------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .pagination {
+        gap: 2px;
+    }
+    .pagination .page-item {
+        min-width: 0;
+    }
+    .pagination .page-link {
+        padding: var(--space-2) var(--space-2);
+        font-size: var(--font-size-xs);
+        min-width: 36px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE MODAL
+   --------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .sb-modal-backdrop {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .sb-modal-dialog {
+        max-width: 100% !important;
+        max-height: 90vh !important;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE DROPDOWN
+   --------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .sb-dropdown-menu {
+        position: fixed !important;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+        max-height: 60vh;
+        overflow-y: auto;
+        animation: sb-slide-up 0.2s ease;
+        z-index: calc(var(--z-modal-backdrop) + 1) !important;
+    }
+}
+
+@keyframes sb-slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE EMPTY STATE
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .sb-empty-state {
+        padding: var(--space-8) var(--space-4);
+    }
+    .sb-empty-state-icon {
+        width: 48px;
+        height: 48px;
+    }
+    .sb-empty-state-title {
+        font-size: var(--font-size-base);
+    }
+    .sb-empty-state-description {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE BREADCRUMB
+   --------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+    .sb-breadcrumb ol {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+    .sb-breadcrumb ol::-webkit-scrollbar {
+        display: none;
+    }
+    .sb-breadcrumb-item,
+    .sb-breadcrumb-item a {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE CARD
+   --------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .sb-card {
+        border-radius: var(--radius-lg);
+    }
+    .sb-card-header {
+        padding: var(--space-4);
+    }
+    .sb-card-body {
+        padding: var(--space-4);
+    }
+    .sb-card-footer {
+        padding: var(--space-3) var(--space-4);
+    }
+}
+
+/* ---------------------------------------------------------------
+   HIDDEN / VISIBLE UTILITIES
+   --------------------------------------------------------------- */
+.sb-hidden-xs    { display: none; }
+.sb-hidden-sm    { display: none; }
+.sb-hidden-md    { display: none; }
+.sb-hidden-lg    { display: none; }
+.sb-hidden-xl    { display: none; }
+
+.sb-visible-xs   { display: block; }
+.sb-visible-sm   { display: none; }
+.sb-visible-md   { display: none; }
+.sb-visible-lg   { display: none; }
+.sb-visible-xl   { display: none; }
+
+@media (min-width: 576px) {
+    .sb-hidden-sm  { display: none; }
+    .sb-visible-sm { display: block; }
+    .sb-hidden-xs  { display: block; }
+    .sb-visible-xs { display: none; }
+}
+
+@media (min-width: 768px) {
+    .sb-hidden-md  { display: none; }
+    .sb-visible-md { display: block; }
+    .sb-hidden-xs,
+    .sb-hidden-sm  { display: block; }
+    .sb-visible-xs,
+    .sb-visible-sm { display: none; }
+}
+
+@media (min-width: 992px) {
+    .sb-hidden-lg  { display: none; }
+    .sb-visible-lg { display: block; }
+    .sb-hidden-xs,
+    .sb-hidden-sm,
+    .sb-hidden-md  { display: block; }
+    .sb-visible-xs,
+    .sb-visible-sm,
+    .sb-visible-md { display: none; }
+}
+
+@media (min-width: 1200px) {
+    .sb-hidden-xl  { display: none; }
+    .sb-visible-xl { display: block; }
+    .sb-hidden-xs,
+    .sb-hidden-sm,
+    .sb-hidden-md,
+    .sb-hidden-lg  { display: block; }
+    .sb-visible-xs,
+    .sb-visible-sm,
+    .sb-visible-md,
+    .sb-visible-lg { display: none; }
+}
+
+/* ---------------------------------------------------------------
+   FLEX DIRECTION RESPONSIVE
+   --------------------------------------------------------------- */
+@media (max-width: 575.98px) {
+    .sb-flex-col-mobile {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 576px) {
+    .sb-flex-row-mobile {
+        flex-direction: row;
+    }
+}
+
+/* ---------------------------------------------------------------
+   TOUCH DEVICE ADJUSTMENTS
+   --------------------------------------------------------------- */
+@media (hover: none) and (pointer: coarse) {
+    .sb-card-hover:hover {
+        transform: none;
+        box-shadow: var(--shadow-card);
+    }
+
+    .sb-btn {
+        min-height: 44px;
+    }
+
+    .sb-dropdown-item {
+        min-height: 44px;
+        padding: var(--space-3) var(--space-4);
+    }
+}
+
+/* ---------------------------------------------------------------
+   SAFE AREA INSETS (Notch Devices)
+   --------------------------------------------------------------- */
+@supports (padding: env(safe-area-inset-bottom)) {
+    .sb-main-content {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .sb-topbar {
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
+/* ---------------------------------------------------------------
+   LANDSCAPE PHONE
+   --------------------------------------------------------------- */
+@media (max-height: 480px) and (orientation: landscape) {
+    .sb-modal-dialog {
+        max-height: 95vh;
+    }
+    .ds-welcome-banner {
+        padding: var(--space-4);
+    }
+}

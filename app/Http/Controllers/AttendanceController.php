@@ -12,14 +12,28 @@ use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function dashboard(): View
     {
+        $schoolId = $this->schoolId();
         $today = now()->toDateString();
 
-        $totalPresentToday = Attendance::where('attendance_date', $today)->where('status', 'present')->count();
-        $totalAbsentToday = Attendance::where('attendance_date', $today)->where('status', 'absent')->count();
-        $totalLateToday = Attendance::where('attendance_date', $today)->where('status', 'late')->count();
-        $totalExcusedToday = Attendance::where('attendance_date', $today)->where('status', 'excused')->count();
+        $statusCounts = Attendance::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->where('attendance_date', $today)
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $totalPresentToday = $statusCounts->get('present', 0);
+        $totalAbsentToday = $statusCounts->get('absent', 0);
+        $totalLateToday = $statusCounts->get('late', 0);
+        $totalExcusedToday = $statusCounts->get('excused', 0);
         $totalMarkedToday = $totalPresentToday + $totalAbsentToday + $totalLateToday + $totalExcusedToday;
 
         $attendancePercentage = $totalMarkedToday > 0
@@ -27,14 +41,15 @@ class AttendanceController extends Controller
             : 0;
 
         $recentAttendances = Attendance::with('student', 'schoolClass', 'marker')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->where('attendance_date', $today)
             ->latest()
             ->take(10)
             ->get();
 
-        $classesWithTodayAttendance = SchoolClass::withCount(['students', 'attendances' => function ($query) use ($today) {
-            $query->where('attendance_date', $today);
-        }])->get();
+        $classesWithTodayAttendance = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->withCount(['students' => fn ($q) => $q->where('status', 'active'), 'attendances' => fn ($q) => $q->where('attendance_date', $today)])
+            ->get();
 
         return view('attendance.dashboard', compact(
             'today',
@@ -51,7 +66,8 @@ class AttendanceController extends Controller
 
     public function create(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
         $selectedClass = $request->class_id;
         $selectedDate = $request->date ?? now()->toDateString();
 
@@ -127,13 +143,16 @@ class AttendanceController extends Controller
 
         return redirect()
             ->route('attendance.class-report.show', $class)
-            ->with('success', 'Attendance recorded successfully for ' . now()->parse($attendanceDate)->format('M d, Y') . '.');
+            ->with('success', 'Attendance recorded successfully for '.now()->parse($attendanceDate)->format('M d, Y').'.');
     }
 
     public function index(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $attendances = Attendance::query()
             ->with('student', 'schoolClass', 'school', 'marker')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->date, function ($query, $date) {
                 $query->where('attendance_date', $date);
             })
@@ -151,8 +170,8 @@ class AttendanceController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $classes = SchoolClass::orderBy('name')->get();
-        $students = Student::orderBy('first_name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $students = Student::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('first_name')->get();
 
         return view('attendance.index', compact('attendances', 'classes', 'students'));
     }
@@ -194,7 +213,8 @@ class AttendanceController extends Controller
 
     public function classReport(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
         $selectedClass = $request->class_id;
         $selectedDate = $request->date ?? now()->toDateString();
 
@@ -239,7 +259,8 @@ class AttendanceController extends Controller
 
     public function monthlyReport(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
         $selectedClass = $request->class_id;
         $selectedMonth = $request->month ?? now()->format('Y-m');
 

@@ -17,12 +17,11 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="school_id" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">School <span style="color: #dc3545;">*</span></label>
+                        <label for="school_id" class="sb-form-label">School <span class="required">*</span></label>
                         <select
                             name="school_id"
                             id="school_id"
-                            class="form-control @error('school_id') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-select @error('school_id') is-invalid @enderror"
                             required
                         >
                             <option value="">Select School</option>
@@ -33,68 +32,64 @@
                             @endforeach
                         </select>
                         @error('school_id')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="admission_number" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Admission Number <span style="color: #dc3545;">*</span></label>
+                        <label for="admission_number" class="sb-form-label">Admission Number <span class="required">*</span></label>
                         <input
                             type="text"
                             name="admission_number"
                             id="admission_number"
                             value="{{ old('admission_number', $student->admission_number) }}"
                             placeholder="e.g. ADM-001"
-                            class="form-control @error('admission_number') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('admission_number') is-invalid @enderror"
                             required
                         >
                         @error('admission_number')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="first_name" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">First Name <span style="color: #dc3545;">*</span></label>
+                        <label for="first_name" class="sb-form-label">First Name <span class="required">*</span></label>
                         <input
                             type="text"
                             name="first_name"
                             id="first_name"
                             value="{{ old('first_name', $student->first_name) }}"
                             placeholder="First name"
-                            class="form-control @error('first_name') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('first_name') is-invalid @enderror"
                             required
                         >
                         @error('first_name')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="last_name" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Last Name <span style="color: #dc3545;">*</span></label>
+                        <label for="last_name" class="sb-form-label">Last Name <span class="required">*</span></label>
                         <input
                             type="text"
                             name="last_name"
                             id="last_name"
                             value="{{ old('last_name', $student->last_name) }}"
                             placeholder="Last name"
-                            class="form-control @error('last_name') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('last_name') is-invalid @enderror"
                             required
                         >
                         @error('last_name')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="gender" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Gender <span style="color: #dc3545;">*</span></label>
+                        <label for="gender" class="sb-form-label">Gender <span class="required">*</span></label>
                         <select
                             name="gender"
                             id="gender"
-                            class="form-control @error('gender') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-select @error('gender') is-invalid @enderror"
                             required
                         >
                             <option value="">Select Gender</option>
@@ -102,17 +97,16 @@
                             <option value="female" {{ old('gender', $student->gender) === 'female' ? 'selected' : '' }}>Female</option>
                         </select>
                         @error('gender')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="school_class_id" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Class</label>
+                        <label for="school_class_id" class="sb-form-label">Class</label>
                         <select
                             name="school_class_id"
                             id="school_class_id"
-                            class="form-control @error('school_class_id') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-select @error('school_class_id') is-invalid @enderror"
                         >
                             <option value="">Select Class</option>
                             @foreach($schoolClasses as $class)
@@ -122,96 +116,91 @@
                             @endforeach
                         </select>
                         @error('school_class_id')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="date_of_birth" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Date of Birth <span style="color: #dc3545;">*</span></label>
+                        <label for="date_of_birth" class="sb-form-label">Date of Birth <span class="required">*</span></label>
                         <input
                             type="date"
                             name="date_of_birth"
                             id="date_of_birth"
                             value="{{ old('date_of_birth', $student->date_of_birth->format('Y-m-d')) }}"
-                            class="form-control @error('date_of_birth') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('date_of_birth') is-invalid @enderror"
                             required
                         >
                         @error('date_of_birth')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="email" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Email</label>
+                        <label for="email" class="sb-form-label">Email</label>
                         <input
                             type="email"
                             name="email"
                             id="email"
                             value="{{ old('email', $student->email) }}"
                             placeholder="student@example.com"
-                            class="form-control @error('email') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('email') is-invalid @enderror"
                         >
                         @error('email')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="phone" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Phone</label>
+                        <label for="phone" class="sb-form-label">Phone</label>
                         <input
                             type="text"
                             name="phone"
                             id="phone"
                             value="{{ old('phone', $student->phone) }}"
                             placeholder="Phone number"
-                            class="form-control @error('phone') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-input @error('phone') is-invalid @enderror"
                         >
                         @error('phone')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="address" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Address</label>
+                        <label for="address" class="sb-form-label">Address</label>
                         <textarea
                             name="address"
                             id="address"
                             placeholder="Home address"
-                            class="form-control @error('address') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-textarea @error('address') is-invalid @enderror"
                             rows="2"
                         >{{ old('address', $student->address) }}</textarea>
                         @error('address')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="status" style="display: block; font-weight: 500; font-size: 14px; color: #333; margin-bottom: 6px;">Status <span style="color: #dc3545;">*</span></label>
+                        <label for="status" class="sb-form-label">Status <span class="required">*</span></label>
                         <select
                             name="status"
                             id="status"
-                            class="form-control @error('status') is-invalid @enderror"
-                            style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;"
+                            class="sb-form-select @error('status') is-invalid @enderror"
                             required
                         >
                             <option value="active" {{ old('status', $student->status) === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ old('status', $student->status) === 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         @error('status')
-                            <div style="color: #dc3545; font-size: 13px; margin-top: 4px;">{{ $message }}</div>
+                            <div class="sb-form-error">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
                 <div class="d-flex gap-2 mt-2">
-                    <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 28px; font-weight: 500; border: none; cursor: pointer;">
+                    <button type="submit" class="sb-btn sb-btn-primary">
                         Update Student
                     </button>
-                    <a href="{{ route('students.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 28px; font-weight: 500; text-decoration: none;">
+                    <a href="{{ route('students.index') }}" class="sb-btn sb-btn-secondary">
                         Cancel
                     </a>
                 </div>

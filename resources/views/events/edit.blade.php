@@ -9,7 +9,7 @@
             <h2>Edit Event</h2>
             <p class="text-muted mb-0">Update: {{ $event->title }}</p>
         </div>
-        <a href="{{ route('events.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+        <a href="{{ route('events.index') }}" class="sb-btn sb-btn-secondary">
             ← Back to Events
         </a>
     </div>
@@ -25,26 +25,26 @@
                         <h5 style="font-weight: 600; color: #1a1a2e; margin-bottom: 20px;">Event Details</h5>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Title <span style="color: #dc3545;">*</span></label>
-                            <input type="text" name="title" class="form-control" value="{{ old('title', $event->title) }}" required style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Title <span class="required">*</span></label>
+                            <input type="text" name="title" class="sb-form-input @error('title') is-invalid @enderror" value="{{ old('title', $event->title) }}" required>
                             @error('title')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Description</label>
-                            <textarea name="description" class="form-control" rows="6" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">{{ old('description', $event->description) }}</textarea>
+                            <label class="sb-form-label">Description</label>
+                            <textarea name="description" class="sb-form-textarea @error('description') is-invalid @enderror" rows="6">{{ old('description', $event->description) }}</textarea>
                             @error('description')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Location</label>
-                            <input type="text" name="location" class="form-control" value="{{ old('location', $event->location) }}" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Location</label>
+                            <input type="text" name="location" class="sb-form-input @error('location') is-invalid @enderror" value="{{ old('location', $event->location) }}">
                             @error('location')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -57,26 +57,26 @@
                         <h5 style="font-weight: 600; color: #1a1a2e; margin-bottom: 20px;">Schedule</h5>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Event Date <span style="color: #dc3545;">*</span></label>
-                            <input type="date" name="event_date" class="form-control" value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}" required style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Event Date <span class="required">*</span></label>
+                            <input type="date" name="event_date" class="sb-form-input @error('event_date') is-invalid @enderror" value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}" required>
                             @error('event_date')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Start Time</label>
-                            <input type="time" name="start_time" class="form-control" value="{{ old('start_time', $event->start_time?->format('H:i')) }}" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Start Time</label>
+                            <input type="time" name="start_time" class="sb-form-input @error('start_time') is-invalid @enderror" value="{{ old('start_time', $event->start_time?->format('H:i')) }}">
                             @error('start_time')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">End Time</label>
-                            <input type="time" name="end_time" class="form-control" value="{{ old('end_time', $event->end_time?->format('H:i')) }}" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">End Time</label>
+                            <input type="time" name="end_time" class="sb-form-input @error('end_time') is-invalid @enderror" value="{{ old('end_time', $event->end_time?->format('H:i')) }}">
                             @error('end_time')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -87,35 +87,35 @@
                         <h5 style="font-weight: 600; color: #1a1a2e; margin-bottom: 20px;">Classification</h5>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Event Type <span style="color: #dc3545;">*</span></label>
-                            <select name="event_type" class="form-control" required style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Event Type <span class="required">*</span></label>
+                            <select name="event_type" class="sb-form-select @error('event_type') is-invalid @enderror" required>
                                 @foreach(['academic' => 'Academic', 'exam' => 'Exam', 'holiday' => 'Holiday', 'meeting' => 'Meeting', 'sports' => 'Sports', 'other' => 'Other'] as $value => $label)
                                     <option value="{{ $value }}" {{ old('event_type', $event->event_type) === $value ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
                             </select>
                             @error('event_type')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Status</label>
-                            <select name="status" class="form-control" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;">
+                            <label class="sb-form-label">Status</label>
+                            <select name="status" class="sb-form-select @error('status') is-invalid @enderror">
                                 <option value="draft" {{ old('status', $event->status) === 'draft' ? 'selected' : '' }}>Draft</option>
                                 <option value="published" {{ old('status', $event->status) === 'published' ? 'selected' : '' }}>Published</option>
                             </select>
                             @error('status')
-                                <small style="color: #dc3545;">{{ $message }}</small>
+                                <div class="sb-form-error">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 24px; font-weight: 500; border: none; cursor: pointer; flex: 1;">
+                    <button type="submit" class="sb-btn sb-btn-primary" style="flex: 1;">
                         Update Event
                     </button>
-                    <a href="{{ route('events.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+                    <a href="{{ route('events.index') }}" class="sb-btn sb-btn-secondary">
                         Cancel
                     </a>
                 </div>

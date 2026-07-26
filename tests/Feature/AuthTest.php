@@ -10,8 +10,8 @@ it('allows a user to register and access the dashboard', function () {
     $response = $this->post('/register', [
         'name' => 'Jane Doe',
         'email' => 'jane@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123',
+        'password_confirmation' => 'Password123',
     ]);
 
     $response->assertRedirect('/dashboard');
@@ -36,7 +36,7 @@ it('allows a user to log in and log out', function () {
     $this->assertAuthenticatedAs($user);
 
     $this->post('/logout')
-        ->assertRedirect('/');
+        ->assertRedirect('/login');
 
     $this->assertGuest();
 });

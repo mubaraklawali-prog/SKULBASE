@@ -245,26 +245,38 @@ class ReportController extends Controller
             $request->status ?? 'active'
         );
 
-        $pdf = Pdf::loadView('reports.exports.student-list-pdf', [
-            'students' => $students,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.student-list-pdf', [
+                'students' => $students,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('student-list-report.pdf');
+            return $pdf->download('student-list-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportTeacherListPdf(): Response
     {
         $teachers = $this->createReportService()->teacherList();
 
-        $pdf = Pdf::loadView('reports.exports.teacher-list-pdf', [
-            'teachers' => $teachers,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.teacher-list-pdf', [
+                'teachers' => $teachers,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('teacher-list-report.pdf');
+            return $pdf->download('teacher-list-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportAttendanceSummaryPdf(Request $request): Response
@@ -275,14 +287,20 @@ class ReportController extends Controller
             $request->class_id ? (int) $request->class_id : null
         );
 
-        $pdf = Pdf::loadView('reports.exports.attendance-summary-pdf', [
-            'records' => $data['records'],
-            'summary' => $data,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.attendance-summary-pdf', [
+                'records' => $data['records'],
+                'summary' => $data,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('attendance-summary-report.pdf');
+            return $pdf->download('attendance-summary-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportPaymentHistoryPdf(Request $request): Response
@@ -295,13 +313,19 @@ class ReportController extends Controller
             $request->method
         );
 
-        $pdf = Pdf::loadView('reports.exports.payment-history-pdf', [
-            'payments' => $payments,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.payment-history-pdf', [
+                'payments' => $payments,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('payment-history-report.pdf');
+            return $pdf->download('payment-history-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportOutstandingPdf(Request $request): Response
@@ -310,14 +334,20 @@ class ReportController extends Controller
             $request->class_id ? (int) $request->class_id : null
         );
 
-        $pdf = Pdf::loadView('reports.exports.outstanding-pdf', [
-            'items' => $data['items'],
-            'totalOutstanding' => $data['total_outstanding'],
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.outstanding-pdf', [
+                'items' => $data['items'],
+                'totalOutstanding' => $data['total_outstanding'],
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('outstanding-fees-report.pdf');
+            return $pdf->download('outstanding-fees-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportResultsSummaryPdf(Request $request): Response
@@ -327,13 +357,19 @@ class ReportController extends Controller
             $request->class_id ? (int) $request->class_id : null
         );
 
-        $pdf = Pdf::loadView('reports.exports.results-summary-pdf', [
-            'summary' => $summary,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.results-summary-pdf', [
+                'summary' => $summary,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('results-summary-report.pdf');
+            return $pdf->download('results-summary-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportClassPerformancePdf(Request $request): Response
@@ -342,13 +378,19 @@ class ReportController extends Controller
             $request->exam_id ? (int) $request->exam_id : null
         );
 
-        $pdf = Pdf::loadView('reports.exports.class-performance-pdf', [
-            'performance' => $performance,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.class-performance-pdf', [
+                'performance' => $performance,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('class-performance-report.pdf');
+            return $pdf->download('class-performance-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     public function exportSubjectPerformancePdf(Request $request): Response
@@ -358,13 +400,19 @@ class ReportController extends Controller
             $request->class_id ? (int) $request->class_id : null
         );
 
-        $pdf = Pdf::loadView('reports.exports.subject-performance-pdf', [
-            'performance' => $performance,
-            'school' => $this->resolveSchool(),
-            'generatedAt' => now()->format('M d, Y \a\t h:i A'),
-        ])->setPaper('a4', 'landscape');
+        try {
+            $pdf = Pdf::loadView('reports.exports.subject-performance-pdf', [
+                'performance' => $performance,
+                'school' => $this->resolveSchool(),
+                'generatedAt' => now()->format('M d, Y \a\t h:i A'),
+            ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('subject-performance-report.pdf');
+            return $pdf->download('subject-performance-report.pdf');
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate PDF. Please try again.');
+        }
     }
 
     // ── CSV Exports ───────────────────────────────────────
@@ -380,7 +428,8 @@ class ReportController extends Controller
         return $this->buildCsvResponse(
             'student-list-report.csv',
             ['S/N', 'Adm. No.', 'First Name', 'Last Name', 'Gender', 'Class', 'Email', 'Phone', 'Status'],
-            $students->map(fn ($s) => [
+            $students->map(fn ($s, $i) => [
+                $i + 1,
                 $s->admission_number,
                 $s->first_name,
                 $s->last_name,
@@ -400,7 +449,8 @@ class ReportController extends Controller
         return $this->buildCsvResponse(
             'teacher-list-report.csv',
             ['S/N', 'First Name', 'Last Name', 'Gender', 'Email', 'Phone', 'Qualification', 'Status'],
-            $teachers->map(fn ($t) => [
+            $teachers->map(fn ($t, $i) => [
+                $i + 1,
                 $t->first_name,
                 $t->last_name,
                 ucfirst($t->gender),
@@ -491,7 +541,7 @@ class ReportController extends Controller
         );
 
         if (! $summary || $summary['subject_averages']->isEmpty()) {
-            return redirect()->route('reports.academic.results-summary')
+            return redirect()->route('reports.academic.results')
                 ->with('error', 'No results data available for export.');
         }
 
@@ -511,6 +561,27 @@ class ReportController extends Controller
     public function exportClassPerformancePdfDirect(Request $request): Response
     {
         return $this->exportClassPerformancePdf($request);
+    }
+
+    public function exportClassPerformanceCsv(Request $request): Response
+    {
+        $performance = $this->createReportService()->classPerformance(
+            $request->exam_id ? (int) $request->exam_id : null
+        );
+
+        return $this->buildCsvResponse(
+            'class-performance-report.csv',
+            ['Class', 'Enrolled', 'Tested', 'Average', 'Pass Rate', 'Highest', 'Lowest'],
+            $performance->map(fn ($item) => [
+                $item['class']->name ?? '—',
+                $item['enrolled'],
+                $item['tested'],
+                $item['average'],
+                $item['pass_rate'],
+                $item['highest'],
+                $item['lowest'],
+            ])
+        );
     }
 
     public function exportSubjectPerformanceCsv(Request $request): Response

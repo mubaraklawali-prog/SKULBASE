@@ -4,25 +4,24 @@
 
 @section('content')
 <div class="welcome-section">
-    <div class="mb-4">
-        <h2>Add Period</h2>
-        <p class="text-muted mb-0">Create a new timetable period</p>
+    <div class="sb-section-header">
+        <div>
+            <h2>Add Period</h2>
+            <p class="text-muted mb-0">Create a new timetable period</p>
+        </div>
+        <a href="{{ route('periods.index') }}" class="sb-btn sb-btn-outline-secondary">← Back</a>
     </div>
 
-    <div class="card stat-card">
+    <div class="sb-card">
         <div class="card-body" style="padding: 32px;">
             <form method="POST" action="{{ route('periods.store') }}">
                 @csrf
 
                 @include('periods._form')
 
-                <div class="d-flex gap-2 mt-2">
-                    <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 28px; font-weight: 500; border: none; cursor: pointer;">
-                        Save Period
-                    </button>
-                    <a href="{{ route('periods.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 28px; font-weight: 500; text-decoration: none;">
-                        Cancel
-                    </a>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="sb-btn sb-btn-primary">Save Period</button>
+                    <a href="{{ route('periods.index') }}" class="sb-btn sb-btn-outline-secondary">Cancel</a>
                 </div>
             </form>
         </div>

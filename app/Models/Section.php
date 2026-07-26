@@ -22,4 +22,9 @@ class Section extends Model
     {
         return $this->hasMany(Timetable::class);
     }
+
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class);
+    }
 }

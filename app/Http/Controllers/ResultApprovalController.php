@@ -22,12 +22,22 @@ class ResultApprovalController extends Controller
         'rejected' => ['draft'],
     ];
 
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function dashboard(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
 
-        $query = StudentReportCard::with('student', 'exam', 'schoolClass');
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+
+        $query = StudentReportCard::with('student', 'exam', 'schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId));
 
         if ($request->exam_id) {
             $query->where('exam_id', $request->exam_id);
@@ -41,15 +51,18 @@ class ResultApprovalController extends Controller
 
         $reportCards = $query->orderByDesc('updated_at')->paginate(20)->withQueryString();
 
-        $statusCounts = [
-            'draft' => StudentReportCard::where('status', 'draft')->count(),
-            'submitted' => StudentReportCard::where('status', 'submitted')->count(),
-            'approved' => StudentReportCard::where('status', 'approved')->count(),
-            'published' => StudentReportCard::where('status', 'published')->count(),
-            'rejected' => StudentReportCard::where('status', 'rejected')->count(),
-        ];
+        $statusCounts = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        foreach (['draft', 'submitted', 'approved', 'published', 'rejected'] as $status) {
+            $statusCounts[$status] = $statusCounts[$status] ?? 0;
+        }
 
         $recentLogs = ResultApprovalLog::with('studentReportCard.student', 'performedByUser')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->latest()
             ->take(10)
             ->get();
@@ -65,6 +78,7 @@ class ResultApprovalController extends Controller
 
     public function submit(StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'submitted');
 
         DB::transaction(function () use ($reportCard) {
@@ -85,6 +99,7 @@ class ResultApprovalController extends Controller
 
     public function approve(StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'approved');
 
         DB::transaction(function () use ($reportCard) {
@@ -105,6 +120,7 @@ class ResultApprovalController extends Controller
 
     public function publish(StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'published');
 
         DB::transaction(function () use ($reportCard) {
@@ -124,6 +140,7 @@ class ResultApprovalController extends Controller
 
     public function unpublish(StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'draft');
 
         DB::transaction(function () use ($reportCard) {
@@ -143,6 +160,7 @@ class ResultApprovalController extends Controller
 
     public function reject(Request $request, StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'rejected');
 
         $validated = $request->validate([
@@ -165,6 +183,7 @@ class ResultApprovalController extends Controller
 
     public function revertToDraft(StudentReportCard $reportCard): RedirectResponse
     {
+        $this->authorizeReportCard($reportCard);
         $this->validateTransition($reportCard, 'draft');
 
         DB::transaction(function () use ($reportCard) {
@@ -215,7 +234,8 @@ class ResultApprovalController extends Controller
             : 'draft'));
 
         $query = StudentReportCard::where('exam_id', $exam->id)
-            ->where('school_class_id', $schoolClass->id);
+            ->where('school_class_id', $schoolClass->id)
+            ->when($this->schoolId(), fn ($q) => $q->where('school_id', $this->schoolId()));
 
         if (is_array($targetStatus)) {
             $query->whereIn('status', $targetStatus);
@@ -270,11 +290,13 @@ class ResultApprovalController extends Controller
 
     public function reports(Request $request): View
     {
+        $schoolId = $this->schoolId();
         $type = $request->type ?? 'published';
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
-        $query = StudentReportCard::with('student', 'exam', 'schoolClass');
+        $query = StudentReportCard::with('student', 'exam', 'schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId));
 
         if ($request->exam_id) {
             $query->where('exam_id', $request->exam_id);
@@ -293,12 +315,22 @@ class ResultApprovalController extends Controller
 
         $reportCards = $type === 'history'
             ? ResultApprovalLog::with('studentReportCard.student', 'studentReportCard.exam', 'performedByUser')
+                ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
                 ->latest()
                 ->paginate(20)
                 ->withQueryString()
             : $query->latest()->paginate(20)->withQueryString();
 
         return view('results.approvals.reports', compact('reportCards', 'type', 'exams', 'classes'));
+    }
+
+    private function authorizeReportCard(StudentReportCard $reportCard): void
+    {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $reportCard->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
     }
 
     private function validateTransition(StudentReportCard $reportCard, string $newStatus): void

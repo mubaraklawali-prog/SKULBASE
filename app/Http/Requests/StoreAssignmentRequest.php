@@ -25,7 +25,7 @@ class StoreAssignmentRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'instructions' => ['nullable', 'string'],
-            'attachment' => ['nullable', 'file', 'max:10240'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip', 'max:10240'],
             'total_marks' => ['nullable', 'integer', 'min:1'],
             'status' => ['sometimes', 'in:draft,published'],
             'due_date' => ['required', 'date', 'after_or_equal:today'],

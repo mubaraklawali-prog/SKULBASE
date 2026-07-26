@@ -13,9 +13,13 @@ class SchoolClassController extends Controller
 {
     public function index(Request $request): View
     {
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+
         $schoolClasses = SchoolClass::query()
             ->with('school')
             ->withCount('students')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('section', 'like', "%{$search}%");
@@ -29,19 +33,30 @@ class SchoolClassController extends Controller
 
     public function create(): View
     {
-        $schools = School::orderBy('name')->get();
+        $user = auth()->user();
+
+        $schools = $user->role === 'super_admin'
+            ? School::orderBy('name')->get()
+            : School::where('id', $user->school_id)->get();
 
         return view('classes.create', compact('schools'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'name' => 'required|string|max:255',
             'section' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
+
+        if ($user->role !== 'super_admin') {
+            abort_if((int) $validated['school_id'] !== (int) $user->school_id, 403, 'Unauthorized access.');
+            $validated['school_id'] = $user->school_id;
+        }
 
         $validated['status'] = true;
 
@@ -54,6 +69,8 @@ class SchoolClassController extends Controller
 
     public function show(SchoolClass $schoolClass): View
     {
+        $this->authorizeSchool($schoolClass);
+
         $schoolClass->load([
             'school',
             'students.school',
@@ -71,13 +88,23 @@ class SchoolClassController extends Controller
 
     public function edit(SchoolClass $schoolClass): View
     {
-        $schools = School::orderBy('name')->get();
+        $this->authorizeSchool($schoolClass);
+
+        $user = auth()->user();
+
+        $schools = $user->role === 'super_admin'
+            ? School::orderBy('name')->get()
+            : School::where('id', $user->school_id)->get();
 
         return view('classes.edit', compact('schoolClass', 'schools'));
     }
 
     public function update(Request $request, SchoolClass $schoolClass): RedirectResponse
     {
+        $this->authorizeSchool($schoolClass);
+
+        $user = auth()->user();
+
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'name' => 'required|string|max:255',
@@ -85,6 +112,11 @@ class SchoolClassController extends Controller
             'description' => 'nullable|string|max:1000',
             'status' => 'required|boolean',
         ]);
+
+        if ($user->role !== 'super_admin') {
+            abort_if((int) $validated['school_id'] !== (int) $user->school_id, 403, 'Unauthorized access.');
+            $validated['school_id'] = $user->school_id;
+        }
 
         $schoolClass->update($validated);
 
@@ -95,6 +127,20 @@ class SchoolClassController extends Controller
 
     public function destroy(SchoolClass $schoolClass): RedirectResponse
     {
+        $this->authorizeSchool($schoolClass);
+
+        $hasData = $schoolClass->students()->exists()
+            || $schoolClass->feeStructures()->exists()
+            || $schoolClass->timetables()->exists()
+            || $schoolClass->assignments()->exists()
+            || $schoolClass->studentResults()->exists();
+
+        if ($hasData) {
+            return back()->with('error', 'Cannot delete this class because it still has associated records (students, fee structures, timetables, assignments, or results). Please remove all dependent records first.');
+        }
+
+        $schoolClass->subjects()->detach();
+        $schoolClass->teachers()->detach();
         $schoolClass->delete();
 
         return redirect()
@@ -104,6 +150,8 @@ class SchoolClassController extends Controller
 
     public function toggleStatus(SchoolClass $schoolClass): RedirectResponse
     {
+        $this->authorizeSchool($schoolClass);
+
         $schoolClass->update([
             'status' => ! $schoolClass->status,
         ]);
@@ -124,5 +172,16 @@ class SchoolClassController extends Controller
             ->get();
 
         return response()->json($classes);
+    }
+
+    protected function authorizeSchool(SchoolClass $schoolClass): void
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'super_admin') {
+            return;
+        }
+
+        abort_if($schoolClass->school_id !== $user->school_id, 403, 'Unauthorized access.');
     }
 }

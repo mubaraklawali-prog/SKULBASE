@@ -17,15 +17,8 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 8px;">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px;">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -36,8 +29,8 @@
             <div class="card-body">
                 <div class="d-flex gap-3 align-items-end">
                     <div style="flex: 3;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; color: #6c757d; margin-bottom: 6px;">Select School</label>
-                        <select name="school_id" style="width: 100%; padding: 10px 16px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 14px;" onchange="this.form.submit()">
+                        <label class="sb-form-label">Select School</label>
+                        <select name="school_id" class="sb-form-select" onchange="this.form.submit()">
                             <option value="">All Schools (Aggregated)</option>
                             @foreach($schools as $s)
                                 <option value="{{ $s->id }}" {{ request('school_id') == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>

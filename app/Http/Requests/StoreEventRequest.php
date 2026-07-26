@@ -13,7 +13,7 @@ class StoreEventRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'event_type' => ['required', 'in:academic,exam,holiday,meeting,sports,other'],
@@ -23,5 +23,11 @@ class StoreEventRequest extends FormRequest
             'location' => ['nullable', 'string', 'max:255'],
             'status' => ['sometimes', 'in:draft,published'],
         ];
+
+        if ($this->user() && $this->user()->role === 'super_admin') {
+            $rules['school_id'] = ['required', 'exists:schools,id'];
+        }
+
+        return $rules;
     }
 }

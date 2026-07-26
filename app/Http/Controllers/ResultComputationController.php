@@ -18,22 +18,33 @@ class ResultComputationController extends Controller
         private ResultComputationService $computationService,
     ) {}
 
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function dashboard(): View
     {
-        $totalReportCards = StudentReportCard::count();
-        $publishedResults = StudentReportCard::where('status', 'published')->count();
-        $draftResults = StudentReportCard::where('status', 'draft')->count();
-        $approvedResults = StudentReportCard::where('status', 'approved')->count();
+        $schoolId = $this->schoolId();
 
-        $classAverage = StudentReportCard::avg('average_score');
+        $totalReportCards = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->count();
+        $publishedResults = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', 'published')->count();
+        $draftResults = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', 'draft')->count();
+        $approvedResults = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', 'approved')->count();
+
+        $classAverage = StudentReportCard::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->avg('average_score');
 
         $topPerformers = StudentReportCard::with('student', 'schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->where('status', '!=', 'draft')
             ->orderByDesc('average_score')
             ->take(10)
             ->get();
 
         $recentComputations = StudentReportCard::with('student', 'exam', 'schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->latest()
             ->take(10)
             ->get();
@@ -51,8 +62,10 @@ class ResultComputationController extends Controller
 
     public function compute(Request $request): View
     {
-        $exams = Exam::where('status', true)->orderBy('name')->get();
-        $classes = SchoolClass::where('status', true)->orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $selectedClass = $request->school_class_id;
@@ -113,6 +126,12 @@ class ResultComputationController extends Controller
 
     public function show(StudentReportCard $reportCard): View
     {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $reportCard->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $reportCard->load('student', 'exam', 'schoolClass', 'school');
 
         $subjectScores = $this->computationService->getSubjectScores(
@@ -126,6 +145,12 @@ class ResultComputationController extends Controller
 
     public function updateComment(Request $request, StudentReportCard $reportCard): RedirectResponse
     {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $reportCard->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $validated = $request->validate([
             'teacher_comment' => 'nullable|string|max:1000',
             'principal_comment' => 'nullable|string|max:1000',
@@ -156,8 +181,10 @@ class ResultComputationController extends Controller
 
     public function classRanking(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $selectedClass = $request->school_class_id;
@@ -188,9 +215,11 @@ class ResultComputationController extends Controller
 
     public function subjectRanking(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $subjects = Subject::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $selectedClass = $request->school_class_id;
@@ -247,7 +276,9 @@ class ResultComputationController extends Controller
 
     public function topPerformers(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $limit = $request->limit ?? 20;
@@ -275,8 +306,10 @@ class ResultComputationController extends Controller
 
     public function analytics(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $selectedClass = $request->school_class_id;

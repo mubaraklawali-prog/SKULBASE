@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AssessmentType;
 use App\Models\Exam;
-use App\Models\School;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentResult;
@@ -17,22 +16,33 @@ use Illuminate\View\View;
 
 class ScoreEntryController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function dashboard(): View
     {
-        $totalEntries = StudentResult::count();
-        $examsWithScores = StudentResult::distinct('exam_id')->count('exam_id');
-        $subjectsWithScores = StudentResult::distinct('subject_id')->count('subject_id');
+        $schoolId = $this->schoolId();
 
-        $totalStudents = Student::where('status', 'active')->count();
-        $studentsWithScores = StudentResult::distinct('student_id')->count('student_id');
+        $totalEntries = StudentResult::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->count();
+        $examsWithScores = StudentResult::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->distinct('exam_id')->count('exam_id');
+        $subjectsWithScores = StudentResult::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->distinct('subject_id')->count('subject_id');
+
+        $totalStudents = Student::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', 'active')->count();
+        $studentsWithScores = StudentResult::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->distinct('student_id')->count('student_id');
         $pendingEntries = $totalStudents - $studentsWithScores;
 
         $recentEntries = StudentResult::with('student', 'exam', 'subject', 'schoolClass', 'assessmentType')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->latest()
             ->take(10)
             ->get();
 
         $topScorers = StudentResult::with('student')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->select('student_id', DB::raw('AVG(score) as avg_score'))
             ->groupBy('student_id')
             ->orderByDesc('avg_score')
@@ -51,8 +61,10 @@ class ScoreEntryController extends Controller
 
     public function create(Request $request): View
     {
-        $exams = Exam::where('status', true)->orderBy('name')->get();
-        $classes = SchoolClass::where('status', true)->orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
         $subjects = collect();
         $assessmentTypes = collect();
         $students = collect();
@@ -184,8 +196,10 @@ class ScoreEntryController extends Controller
 
     public function edit(Request $request): View
     {
-        $exams = Exam::where('status', true)->orderBy('name')->get();
-        $classes = SchoolClass::where('status', true)->orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->where('status', true)->orderBy('name')->get();
         $subjects = collect();
         $assessmentTypes = collect();
         $students = collect();
@@ -302,8 +316,11 @@ class ScoreEntryController extends Controller
 
     public function history(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $scores = StudentResult::query()
             ->with('student', 'exam', 'subject', 'schoolClass', 'assessmentType', 'teacher')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->exam_id, function ($query, $examId) {
                 $query->where('exam_id', $examId);
             })
@@ -326,18 +343,18 @@ class ScoreEntryController extends Controller
                 $query->where('created_at', '>=', $date);
             })
             ->when($request->date_to, function ($query, $date) {
-                $query->where('created_at', '<=', $date . ' 23:59:59');
+                $query->where('created_at', '<=', $date.' 23:59:59');
             })
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
-        $assessmentTypes = AssessmentType::orderBy('name')->get();
-        $students = Student::orderBy('first_name')->get();
-        $teachers = Teacher::orderBy('first_name')->get();
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $subjects = Subject::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $assessmentTypes = AssessmentType::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $students = Student::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('first_name')->get();
+        $teachers = Teacher::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('first_name')->get();
 
         return view('results.scores.history', compact(
             'scores',
@@ -352,6 +369,12 @@ class ScoreEntryController extends Controller
 
     public function show(StudentResult $score): View
     {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $score->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $score->load('student', 'exam', 'subject', 'schoolClass', 'assessmentType', 'teacher', 'school');
 
         return view('results.scores.show', compact('score'));
@@ -359,6 +382,12 @@ class ScoreEntryController extends Controller
 
     public function destroy(StudentResult $score): RedirectResponse
     {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $score->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $score->delete();
 
         return redirect()
@@ -368,6 +397,12 @@ class ScoreEntryController extends Controller
 
     public function studentReport(Student $student): View
     {
+        $schoolId = $this->schoolId();
+
+        if ($schoolId && $student->school_id !== $schoolId) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $student->load('school', 'schoolClass');
 
         $scores = StudentResult::with('exam', 'subject', 'assessmentType', 'teacher')
@@ -379,8 +414,8 @@ class ScoreEntryController extends Controller
 
         $groupedScores = $scores->groupBy('exam.id');
 
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         return view('results.scores.student-report', compact(
             'student',
@@ -393,9 +428,11 @@ class ScoreEntryController extends Controller
 
     public function subjectReport(Request $request): View
     {
-        $subjects = Subject::orderBy('name')->get();
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $subjects = Subject::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedSubject = $request->subject_id;
         $selectedExam = $request->exam_id;
@@ -422,6 +459,7 @@ class ScoreEntryController extends Controller
 
             $studentAverages = $scores->groupBy('student_id')->map(function ($studentScores) {
                 $avg = $studentScores->avg('score');
+
                 return [
                     'student' => $studentScores->first()->student,
                     'avg_score' => round($avg, 2),
@@ -445,9 +483,11 @@ class ScoreEntryController extends Controller
 
     public function classReport(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
-        $exams = Exam::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $subjects = Subject::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedClass = $request->school_class_id;
         $selectedExam = $request->exam_id;
@@ -475,6 +515,7 @@ class ScoreEntryController extends Controller
 
             $studentAverages = $scores->groupBy('student_id')->map(function ($studentScores) {
                 $avg = $studentScores->avg('score');
+
                 return [
                     'student' => $studentScores->first()->student,
                     'avg_score' => round($avg, 2),
@@ -499,9 +540,11 @@ class ScoreEntryController extends Controller
 
     public function examReport(Request $request): View
     {
-        $exams = Exam::orderBy('name')->get();
-        $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $exams = Exam::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
+        $subjects = Subject::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         $selectedExam = $request->exam_id;
         $selectedClass = $request->school_class_id;

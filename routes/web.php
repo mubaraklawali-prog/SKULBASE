@@ -6,13 +6,24 @@ use App\Http\Controllers\AssessmentTypeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\FeeController;
 use App\Http\Controllers\GradingSystemController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ParentAssignmentController;
+use App\Http\Controllers\ParentAttendanceController;
+use App\Http\Controllers\ParentController;
+use App\Http\Controllers\ParentDashboardController;
+use App\Http\Controllers\ParentFeesController;
+use App\Http\Controllers\ParentProfileController;
+use App\Http\Controllers\ParentResultsController;
 use App\Http\Controllers\ParentTimetableController;
+use App\Http\Controllers\PendingSchoolController;
 use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PublicRegistrationController;
 use App\Http\Controllers\ReportCardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResultApprovalController;
@@ -20,12 +31,23 @@ use App\Http\Controllers\ResultComputationController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\SchoolSubscriptionController;
 use App\Http\Controllers\ScoreEntryController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\StudentFeeController;
+use App\Http\Controllers\StudentResultsController;
 use App\Http\Controllers\StudentTimetableController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TeacherDashboardController;
+use App\Http\Controllers\TeacherProfileController;
+use App\Http\Controllers\TeacherScoreEntryController;
 use App\Http\Controllers\TeacherTimetableController;
 use App\Http\Controllers\TimetableController;
 use Illuminate\Support\Facades\Route;
@@ -41,7 +63,26 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLoginForm'])
         ->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1');
+
+    Route::get('/forgot-password', [AuthController::class, 'showLinkRequestForm'])
+        ->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])
+        ->name('password.email')
+        ->middleware('throttle:3,1');
+
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])
+        ->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->name('password.update');
+});
+
+Route::middleware('guest')->prefix('school')->name('school.')->group(function () {
+    Route::get('/register', [PublicRegistrationController::class, 'showForm'])
+        ->name('register');
+    Route::post('/register', [PublicRegistrationController::class, 'register'])
+        ->name('register.submit');
 });
 
 // Public Admission Form
@@ -50,34 +91,58 @@ Route::get('/admissions/apply', [AdmissionController::class, 'form'])
 Route::post('/admissions/apply', [AdmissionController::class, 'submit'])
     ->name('admissions.submit');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [AuthController::class, 'dashboard'])
+Route::middleware(['auth', 'school.approval', 'subscription'])->group(function () {
+    Route::get('/dashboard', DashboardController::class)
         ->name('dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-    Route::middleware('role:super_admin')->group(function () {
-        Route::get('/schools', [SchoolController::class, 'index'])
-            ->name('schools.index');
+    Route::get('/change-password', [AuthController::class, 'showPasswordChangeForm'])
+        ->name('password.change');
+    Route::post('/change-password', [AuthController::class, 'changePassword'])
+        ->name('password.change.submit');
 
-        Route::get('/schools/create', [SchoolController::class, 'create'])
-            ->name('schools.create');
+    Route::middleware('role:super_admin,school_admin')->group(function () {
+        // Schools Management (Super Admin only)
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/schools', [SchoolController::class, 'index'])
+                ->name('schools.index');
 
-        Route::post('/schools', [SchoolController::class, 'store'])
-            ->name('schools.store');
+            Route::get('/schools/{school}', [SchoolController::class, 'show'])
+                ->name('schools.show');
 
-        Route::get('/schools/{school}/edit', [SchoolController::class, 'edit'])
-            ->name('schools.edit');
+            Route::get('/schools/create', [SchoolController::class, 'create'])
+                ->name('schools.create');
 
-        Route::put('/schools/{school}', [SchoolController::class, 'update'])
-            ->name('schools.update');
+            Route::post('/schools', [SchoolController::class, 'store'])
+                ->name('schools.store');
 
-        Route::delete('/schools/{school}', [SchoolController::class, 'destroy'])
-            ->name('schools.destroy');
+            Route::get('/schools/{school}/edit', [SchoolController::class, 'edit'])
+                ->name('schools.edit');
 
-        Route::patch('/schools/{school}/toggle-status', [SchoolController::class, 'toggleStatus'])
-            ->name('schools.toggle-status');
+            Route::put('/schools/{school}', [SchoolController::class, 'update'])
+                ->name('schools.update');
+
+            Route::delete('/schools/{school}', [SchoolController::class, 'destroy'])
+                ->name('schools.destroy');
+
+            Route::patch('/schools/{school}/toggle-status', [SchoolController::class, 'toggleStatus'])
+                ->name('schools.toggle-status');
+
+            // Pending Schools (Self-Registration Approval)
+            Route::get('/pending-schools', [PendingSchoolController::class, 'index'])
+                ->name('pending-schools.index');
+
+            Route::get('/pending-schools/{school}', [PendingSchoolController::class, 'show'])
+                ->name('pending-schools.show');
+
+            Route::post('/pending-schools/{school}/approve', [PendingSchoolController::class, 'approve'])
+                ->name('pending-schools.approve');
+
+            Route::post('/pending-schools/{school}/reject', [PendingSchoolController::class, 'reject'])
+                ->name('pending-schools.reject');
+        });
 
         Route::get('/students', [StudentController::class, 'index'])
             ->name('students.index');
@@ -168,6 +233,34 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('/teachers/{teacher}/toggle-status', [TeacherController::class, 'toggleStatus'])
             ->name('teachers.toggle-status');
+
+        Route::get('/teachers/{teacher}/credentials', [TeacherController::class, 'credentials'])
+            ->name('teachers.credentials');
+
+        // Parents Management
+        Route::get('/parents', [ParentController::class, 'index'])
+            ->name('parents.index');
+
+        Route::get('/parents/create', [ParentController::class, 'create'])
+            ->name('parents.create');
+
+        Route::post('/parents', [ParentController::class, 'store'])
+            ->name('parents.store');
+
+        Route::get('/parents/{parent}', [ParentController::class, 'show'])
+            ->name('parents.show');
+
+        Route::get('/parents/{parent}/edit', [ParentController::class, 'edit'])
+            ->name('parents.edit');
+
+        Route::put('/parents/{parent}', [ParentController::class, 'update'])
+            ->name('parents.update');
+
+        Route::delete('/parents/{parent}', [ParentController::class, 'destroy'])
+            ->name('parents.destroy');
+
+        Route::get('/parents/{parent}/credentials', [ParentController::class, 'credentials'])
+            ->name('parents.credentials');
 
         // Attendance
         Route::get('/attendance/dashboard', [AttendanceController::class, 'dashboard'])
@@ -456,6 +549,45 @@ Route::middleware('auth')->group(function () {
         Route::get('/timetables/api/classes', [TimetableController::class, 'getClassesBySchool'])
             ->name('timetables.api.classes');
 
+        // Plans (Super Admin only)
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/plans', [PlanController::class, 'index'])
+                ->name('plans.index');
+
+            Route::get('/plans/create', [PlanController::class, 'create'])
+                ->name('plans.create');
+
+            Route::post('/plans', [PlanController::class, 'store'])
+                ->name('plans.store');
+
+            Route::get('/plans/{plan}', [PlanController::class, 'show'])
+                ->name('plans.show');
+
+            Route::get('/plans/{plan}/edit', [PlanController::class, 'edit'])
+                ->name('plans.edit');
+
+            Route::put('/plans/{plan}', [PlanController::class, 'update'])
+                ->name('plans.update');
+
+            Route::delete('/plans/{plan}', [PlanController::class, 'destroy'])
+                ->name('plans.destroy');
+
+            Route::patch('/plans/{plan}/toggle-status', [PlanController::class, 'toggleStatus'])
+                ->name('plans.toggle-status');
+        });
+
+        // Subscriptions Management (Super Admin only)
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/subscriptions', [SubscriptionController::class, 'index'])
+                ->name('subscriptions.index');
+
+            Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])
+                ->name('subscriptions.show');
+
+            Route::delete('/subscriptions/{subscription}', [SubscriptionController::class, 'destroy'])
+                ->name('subscriptions.destroy');
+        });
+
         // Report Cards
         Route::get('/results/report-cards', [ReportCardController::class, 'bulkSelector'])
             ->name('results.report-cards.bulk');
@@ -692,7 +824,7 @@ Route::middleware('auth')->group(function () {
             ->name('export.outstanding.csv');
         Route::get('/export/results/csv', [ReportController::class, 'exportResultsSummaryCsv'])
             ->name('export.results.csv');
-        Route::get('/export/class-performance/csv', [ReportController::class, 'exportClassPerformancePdfDirect'])
+        Route::get('/export/class-performance/csv', [ReportController::class, 'exportClassPerformanceCsv'])
             ->name('export.class-performance.csv');
         Route::get('/export/subject-performance/csv', [ReportController::class, 'exportSubjectPerformanceCsv'])
             ->name('export.subject-performance.csv');
@@ -700,37 +832,167 @@ Route::middleware('auth')->group(function () {
 
     // Teacher Routes
     Route::middleware('role:teacher')->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('/dashboard', TeacherDashboardController::class)
+            ->name('dashboard');
+
+        Route::get('/profile', TeacherProfileController::class)
+            ->name('profile');
+
         Route::get('/timetable', [TeacherTimetableController::class, 'index'])
             ->name('timetable.index');
 
         Route::get('/timetable/print', [TeacherTimetableController::class, 'print'])
             ->name('timetable.print');
+
+        // Teacher Score Entry
+        Route::get('/scores/entry', [TeacherScoreEntryController::class, 'create'])
+            ->name('scores.create');
+
+        Route::post('/scores/entry', [TeacherScoreEntryController::class, 'store'])
+            ->name('scores.store');
+
+        Route::get('/scores/history', [TeacherScoreEntryController::class, 'history'])
+            ->name('scores.history');
+
+        // Teacher Attendance (requires can_mark_attendance permission)
+        Route::middleware('teacher.permission:can_mark_attendance')->name('attendance.')->group(function () {
+            Route::get('/attendance', [TeacherAttendanceController::class, 'index'])
+                ->name('index');
+
+            Route::get('/attendance/take', [TeacherAttendanceController::class, 'create'])
+                ->name('create');
+
+            Route::post('/attendance', [TeacherAttendanceController::class, 'store'])
+                ->name('store');
+
+            Route::get('/attendance/class-report', [TeacherAttendanceController::class, 'classReport'])
+                ->name('class-report');
+
+            Route::get('/attendance/class-report/{schoolClass}', [TeacherAttendanceController::class, 'classReportShow'])
+                ->name('class-report.show');
+
+            Route::get('/attendance/monthly-report', [TeacherAttendanceController::class, 'monthlyReport'])
+                ->name('monthly-report');
+
+            Route::get('/attendance/monthly-report/{schoolClass}', [TeacherAttendanceController::class, 'monthlyReportShow'])
+                ->name('monthly-report.show');
+
+            Route::get('/attendance/{attendance}', [TeacherAttendanceController::class, 'show'])
+                ->name('show');
+        });
     });
 
     // Student Routes
     Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
+        Route::get('/dashboard', StudentDashboardController::class)
+            ->name('dashboard');
+
+        Route::get('/attendance', [StudentAttendanceController::class, 'index'])
+            ->name('attendance.index');
+
+        Route::get('/results', [StudentResultsController::class, 'index'])
+            ->name('results.index');
+        Route::get('/results/report-card/{reportCard}', [StudentResultsController::class, 'showReportCard'])
+            ->name('results.report-card');
+
+        Route::get('/fees', [StudentFeeController::class, 'index'])
+            ->name('fees.index');
+
+        Route::get('/assignments', [StudentAssignmentController::class, 'index'])
+            ->name('assignments.index');
+        Route::get('/assignments/{assignment}', [StudentAssignmentController::class, 'show'])
+            ->name('assignments.show');
+
         Route::get('/timetable', [StudentTimetableController::class, 'index'])
             ->name('timetable.index');
-
         Route::get('/timetable/print', [StudentTimetableController::class, 'print'])
             ->name('timetable.print');
     });
 
     // Parent Routes
     Route::middleware('role:parent')->prefix('parent')->name('parent.')->group(function () {
+        Route::get('/dashboard', ParentDashboardController::class)
+            ->name('dashboard');
+
+        Route::get('/profile', ParentProfileController::class)
+            ->name('profile');
+
         Route::get('/timetable', [ParentTimetableController::class, 'index'])
             ->name('timetable.index');
-
         Route::get('/timetable/print', [ParentTimetableController::class, 'print'])
             ->name('timetable.print');
+
+        Route::get('/attendance', [ParentAttendanceController::class, 'index'])
+            ->name('attendance.index');
+
+        Route::get('/fees', [ParentFeesController::class, 'index'])
+            ->name('fees.index');
+
+        Route::get('/results', [ParentResultsController::class, 'index'])
+            ->name('results.index');
+        Route::get('/results/report-card/{reportCard}', [ParentResultsController::class, 'showReportCard'])
+            ->name('results.report-card');
+
+        Route::get('/assignments', [ParentAssignmentController::class, 'index'])
+            ->name('assignments.index');
+        Route::get('/assignments/{assignment}', [ParentAssignmentController::class, 'show'])
+            ->name('assignments.show');
     });
 
-    // Settings
+    // School Subscription
+    Route::middleware('role:school_admin,teacher,student,parent')->group(function () {
+        Route::get('/my-subscription', [SchoolSubscriptionController::class, 'index'])
+            ->name('school.subscription.index');
+    });
+
+    // Settings — School-level settings
     Route::middleware('role:super_admin,school_admin')->group(function () {
         Route::get('/settings', [SettingsController::class, 'index'])
             ->name('settings.index');
 
         Route::put('/settings', [SettingsController::class, 'update'])
             ->name('settings.update');
+
+        Route::put('/settings/academic', [SettingsController::class, 'academicUpdate'])
+            ->name('settings.academic.update');
+
+        Route::put('/settings/system', [SettingsController::class, 'systemUpdate'])
+            ->name('settings.system.update');
+
+        Route::put('/settings/notifications', [SettingsController::class, 'notificationUpdate'])
+            ->name('settings.notifications.update');
+
+        Route::get('/settings/about', [SettingsController::class, 'about'])
+            ->name('settings.about');
+    });
+
+    // Backup & Maintenance — Super Admin only (system-level operations)
+    Route::middleware('role:super_admin')->group(function () {
+        Route::get('/settings/backup-maintenance', [SettingsController::class, 'backupMaintenance'])
+            ->name('settings.backup-maintenance');
+
+        Route::post('/settings/backup-maintenance/clear-cache', [SettingsController::class, 'clearCache'])
+            ->name('settings.backup-maintenance.clear-cache');
+
+        Route::post('/settings/backup-maintenance/clear-config-cache', [SettingsController::class, 'clearConfigCache'])
+            ->name('settings.backup-maintenance.clear-config-cache');
+
+        Route::post('/settings/backup-maintenance/clear-route-cache', [SettingsController::class, 'clearRouteCache'])
+            ->name('settings.backup-maintenance.clear-route-cache');
+
+        Route::post('/settings/backup-maintenance/clear-view-cache', [SettingsController::class, 'clearViewCache'])
+            ->name('settings.backup-maintenance.clear-view-cache');
+
+        Route::post('/settings/backup-maintenance/create-storage-link', [SettingsController::class, 'createStorageLink'])
+            ->name('settings.backup-maintenance.create-storage-link');
+
+        Route::post('/settings/backup-maintenance/create-backup', [SettingsController::class, 'createBackup'])
+            ->name('settings.backup-maintenance.create-backup');
+
+        Route::post('/settings/backup-maintenance/enable-maintenance', [SettingsController::class, 'enableMaintenance'])
+            ->name('settings.backup-maintenance.enable-maintenance');
+
+        Route::post('/settings/backup-maintenance/disable-maintenance', [SettingsController::class, 'disableMaintenance'])
+            ->name('settings.backup-maintenance.disable-maintenance');
     });
 });

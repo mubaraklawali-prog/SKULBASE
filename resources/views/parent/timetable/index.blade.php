@@ -70,7 +70,7 @@
     }
     .lesson-card {
         background: #f0f7ff;
-        border-left: 3px solid #4f9cf7;
+        border-left: 3px solid var(--primary);
         border-radius: 6px;
         padding: 8px 10px;
     }
@@ -145,7 +145,7 @@
         transition: all 0.2s;
     }
     .child-selector .form-check:hover {
-        border-color: #4f9cf7;
+        border-color: var(--primary);
         background: #f8f9ff;
     }
     .child-selector .form-check-input:checked + .form-check-label {
@@ -153,7 +153,7 @@
         color: #0a1628;
     }
     .child-selector .form-check:has(.form-check-input:checked) {
-        border-color: #4f9cf7;
+        border-color: var(--primary);
         background: #f0f7ff;
     }
 </style>
@@ -206,8 +206,7 @@
                     </div>
                     <a href="{{ route('parent.timetable.print', ['student_id' => $selectedStudent->id]) }}"
                        target="_blank"
-                       class="btn"
-                       style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                       class="sb-btn sb-btn-outline-secondary d-inline-flex align-items-center gap-2">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 6 2 18 2 18 9"></polyline>
                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>

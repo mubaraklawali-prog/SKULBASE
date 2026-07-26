@@ -16,7 +16,7 @@ class StoreMessageRequest extends FormRequest
         $rules = [
             'subject' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string'],
-            'attachment' => ['nullable', 'file', 'max:10240'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip', 'max:10240'],
         ];
 
         if ($this->input('recipient_type') === 'direct') {

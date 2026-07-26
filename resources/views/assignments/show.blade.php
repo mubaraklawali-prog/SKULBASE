@@ -10,14 +10,14 @@
             <p class="text-muted mb-0">Assignment Details</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('assignments.edit', $assignment) }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <a href="{{ route('assignments.edit', $assignment) }}" class="sb-btn sb-btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
                 Edit
             </a>
-            <a href="{{ route('assignments.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+            <a href="{{ route('assignments.index') }}" class="sb-btn sb-btn-secondary">
                 ← Back
             </a>
         </div>
@@ -64,36 +64,36 @@
                     <h5 style="font-weight: 600; color: #1a1a2e; margin-bottom: 16px;">Information</h5>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Status</div>
+                        <div class="sb-form-label">Status</div>
                         @if($assignment->status === 'published')
-                            <span style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Published</span>
+                            <span class="sb-badge sb-badge-published">Published</span>
                         @else
-                            <span style="background: #fff3cd; color: #664d03; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Draft</span>
+                            <span class="sb-badge sb-badge-draft">Draft</span>
                         @endif
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Teacher</div>
+                        <div class="sb-form-label">Teacher</div>
                         <div style="font-weight: 500; color: #333;">{{ $assignment->teacher->full_name ?? '—' }}</div>
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Class</div>
+                        <div class="sb-form-label">Class</div>
                         <div style="font-weight: 500; color: #333;">{{ $assignment->schoolClass->name ?? '—' }}</div>
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Subject</div>
+                        <div class="sb-form-label">Subject</div>
                         <div style="font-weight: 500; color: #333;">{{ $assignment->subject->name ?? '—' }}</div>
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Total Marks</div>
+                        <div class="sb-form-label">Total Marks</div>
                         <div style="font-weight: 500; color: #333;">{{ $assignment->total_marks ?? '—' }}</div>
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Due Date</div>
+                        <div class="sb-form-label">Due Date</div>
                         <div style="font-weight: 500; {{ $assignment->due_date->isPast() ? 'color: #dc3545;' : 'color: #333;' }}">
                             {{ $assignment->due_date->format('M d, Y') }}
                             @if($assignment->due_date->isPast())
@@ -103,7 +103,7 @@
                     </div>
 
                     <div style="padding: 12px 16px; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Created</div>
+                        <div class="sb-form-label">Created</div>
                         <div style="font-weight: 500; color: #333;">{{ $assignment->created_at->format('M d, Y \a\t h:i A') }}</div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                 <form action="{{ route('assignments.destroy', $assignment) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this assignment?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn w-100" style="background: #f8d7da; color: #dc3545; border-radius: 8px; padding: 10px 20px; font-weight: 500; border: none; cursor: pointer;">
+                    <button type="submit" class="sb-btn sb-btn-outline-danger w-100">
                         Delete Assignment
                     </button>
                 </form>

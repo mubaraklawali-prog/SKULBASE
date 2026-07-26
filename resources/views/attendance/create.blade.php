@@ -4,14 +4,12 @@
 
 @section('content')
 <div class="welcome-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="sb-section-header d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2>Take Attendance</h2>
             <p class="text-muted mb-0">Mark student attendance for a class</p>
         </div>
-        <a href="{{ route('attendance.dashboard') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
-            Back to Dashboard
-        </a>
+        <a href="{{ route('attendance.dashboard') }}" class="sb-btn sb-btn-secondary">Back to Dashboard</a>
     </div>
 
     @if($errors->any())
@@ -28,8 +26,8 @@
         <div class="card-body">
             <div class="d-flex gap-3 align-items-end">
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #6c757d; margin-bottom: 6px;">Select Class</label>
-                    <select name="class_id" required style="width: 100%; padding: 10px 16px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 14px;">
+                    <label class="sb-form-label">Select Class</label>
+                    <select name="class_id" required class="sb-form-select w-100">
                         <option value="">-- Choose a class --</option>
                         @foreach($classes as $class)
                             <option value="{{ $class->id }}" {{ $selectedClass == $class->id ? 'selected' : '' }}>
@@ -39,12 +37,10 @@
                     </select>
                 </div>
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #6c757d; margin-bottom: 6px;">Date</label>
-                    <input type="date" name="date" value="{{ $selectedDate }}" max="{{ date('Y-m-d') }}" required style="width: 100%; padding: 10px 16px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 14px;">
+                    <label class="sb-form-label">Date</label>
+                    <input type="date" name="date" value="{{ $selectedDate }}" max="{{ date('Y-m-d') }}" required class="sb-form-input w-100">
                 </div>
-                <button type="submit" class="btn" style="background: #0a1628; color: #fff; border-radius: 8px; padding: 10px 24px; font-weight: 500; border: none; cursor: pointer;">
-                    Load Students
-                </button>
+                <button type="submit" class="sb-btn sb-btn-dark">Load Students</button>
             </div>
         </div>
     </form>
@@ -57,7 +53,7 @@
 
             <div class="card stat-card mb-4">
                 <div class="card-body p-0">
-                    <div style="padding: 20px 24px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="sb-section-header" style="padding: 20px 24px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h5 style="font-weight: 600; margin: 0; color: #1a1a2e;">{{ $students->count() }} {{ Str::plural('Student', $students->count()) }}</h5>
                             <p style="margin: 4px 0 0 0; font-size: 13px; color: #6c757d;">
@@ -68,36 +64,32 @@
                             </p>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="button" onclick="markAll('present')" class="btn btn-sm" style="background: #d1e7dd; color: #0f5132; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; border: none;">
-                                All Present
-                            </button>
-                            <button type="button" onclick="markAll('absent')" class="btn btn-sm" style="background: #f8d7da; color: #842029; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; border: none;">
-                                All Absent
-                            </button>
+                            <button type="button" onclick="markAll('present')" class="sb-btn sb-btn-sm" style="background: #d1e7dd; color: #0f5132;">All Present</button>
+                            <button type="button" onclick="markAll('absent')" class="sb-btn sb-btn-sm" style="background: #f8d7da; color: #842029;">All Absent</button>
                         </div>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
+                        <table class="sb-table table table-hover mb-0">
                             <thead>
-                                <tr style="background: #f8f9fa;">
-                                    <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; width: 50px;">#</th>
-                                    <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Student</th>
-                                    <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Adm. No.</th>
-                                    <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Status</th>
-                                    <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Remarks</th>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Student</th>
+                                    <th>Adm. No.</th>
+                                    <th class="text-center">Status</th>
+                                    <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($students as $index => $student)
                                     @php $currentStatus = $existingAttendances[$student->id] ?? 'present'; @endphp
                                     <tr>
-                                        <td style="padding: 14px 20px; color: #6c757d;">{{ $index + 1 }}</td>
-                                        <td style="padding: 14px 20px; font-weight: 500;">{{ $student->full_name }}</td>
-                                        <td style="padding: 14px 20px;">
+                                        <td>{{ $index + 1 }}</td>
+                                        <td style="font-weight: 500;">{{ $student->full_name }}</td>
+                                        <td>
                                             <code style="background: #f0f2f5; padding: 2px 8px; border-radius: 4px; font-size: 13px;">{{ $student->admission_number }}</code>
                                         </td>
-                                        <td style="padding: 14px 20px; text-align: center;">
+                                        <td class="text-center">
                                             <input type="hidden" name="attendances[{{ $index }}][student_id]" value="{{ $student->id }}">
                                             <div class="d-flex gap-1 justify-content-center">
                                                 <label style="cursor: pointer;">
@@ -118,8 +110,8 @@
                                                 </label>
                                             </div>
                                         </td>
-                                        <td style="padding: 14px 20px;">
-                                            <input type="text" name="attendances[{{ $index }}][remarks]" placeholder="Optional remarks" style="width: 100%; padding: 6px 12px; border-radius: 6px; border: 1px solid #dee2e6; font-size: 13px;">
+                                        <td>
+                                            <input type="text" name="attendances[{{ $index }}][remarks]" placeholder="Optional remarks" class="sb-form-input" style="width: 100%;">
                                         </td>
                                     </tr>
                                 @endforeach
@@ -130,18 +122,16 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('attendance.create') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
-                    Cancel
-                </a>
-                <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 24px; font-weight: 500; border: none; cursor: pointer;">
-                    Save Attendance
-                </button>
+                <a href="{{ route('attendance.create') }}" class="sb-btn sb-btn-secondary">Cancel</a>
+                <button type="submit" class="sb-btn sb-btn-primary">Save Attendance</button>
             </div>
         </form>
     @elseif($selectedClass && $students->isEmpty())
         <div class="card stat-card">
-            <div class="card-body" style="padding: 40px; text-align: center; color: #6c757d;">
-                <p style="margin: 0; font-size: 15px;">No active students found in this class.</p>
+            <div class="card-body">
+                <div class="sb-empty-state">
+                    <p style="margin: 0; font-size: 15px;">No active students found in this class.</p>
+                </div>
             </div>
         </div>
     @endif

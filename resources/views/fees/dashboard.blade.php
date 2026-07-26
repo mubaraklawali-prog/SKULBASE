@@ -4,16 +4,16 @@
 
 @section('content')
 <div class="welcome-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="sb-section-header">
         <div>
             <h2>Fees Dashboard</h2>
             <p class="text-muted mb-0">Financial overview and collections</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('fees.payments.create') }}" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+            <a href="{{ route('fees.payments.create') }}" class="sb-btn sb-btn-primary">
                 Record Payment
             </a>
-            <a href="{{ route('fees.structures.create') }}" class="btn" style="background: #0a1628; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+            <a href="{{ route('fees.structures.create') }}" class="sb-btn sb-btn-dark">
                 Add Fee Structure
             </a>
         </div>
@@ -83,27 +83,27 @@
                         <p class="text-muted" style="margin: 0;">No payments recorded yet.</p>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover sb-table mb-0">
                                 <thead>
-                                    <tr style="background: #f8f9fa;">
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Student</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Fee</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Date</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Method</th>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Fee</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Method</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($recentPayments as $payment)
                                         <tr>
-                                            <td style="padding: 12px 16px; font-weight: 500;">
-                                                <a href="{{ route('fees.student', $payment->student) }}" style="color: #333; text-decoration: none;">{{ $payment->student->full_name }}</a>
+                                            <td>
+                                                <a href="{{ route('fees.student', $payment->student) }}" style="color: #333; text-decoration: none; font-weight: 500;">{{ $payment->student->full_name }}</a>
                                             </td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $payment->feeStructure->title ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; font-weight: 600; color: #0f5132;">₦{{ number_format($payment->amount_paid, 2) }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $payment->payment_date->format('M d, Y') }}</td>
-                                            <td style="padding: 12px 16px;">
-                                                <span style="text-transform: capitalize; font-size: 13px;">{{ $payment->payment_method }}</span>
+                                            <td class="text-muted">{{ $payment->feeStructure->title ?? '—' }}</td>
+                                            <td style="font-weight: 600; color: #0f5132;">₦{{ number_format($payment->amount_paid, 2) }}</td>
+                                            <td class="text-muted">{{ $payment->payment_date->format('M d, Y') }}</td>
+                                            <td>
+                                                <span style="text-transform: capitalize;">{{ $payment->payment_method }}</span>
                                             </td>
                                         </tr>
                                     @endforeach

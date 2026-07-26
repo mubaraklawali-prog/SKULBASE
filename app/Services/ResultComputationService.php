@@ -53,9 +53,15 @@ class ResultComputationService
 
         $resultsByStudent = $results->groupBy('student_id');
 
+        $attendanceMap = $this->batchAttendancePercentages(
+            array_keys($resultsByStudent->toArray()),
+            $schoolClass->id,
+            $exam
+        );
+
         $studentAverages = [];
 
-        DB::transaction(function () use ($exam, $schoolClass, $students, $resultsByStudent, $assessmentTypes, $gradingRules, &$studentAverages) {
+        DB::transaction(function () use ($exam, $schoolClass, $resultsByStudent, $assessmentTypes, $gradingRules, $attendanceMap, &$studentAverages) {
             foreach ($resultsByStudent as $studentId => $studentResults) {
                 $computed = $this->computeStudentResult(
                     $exam,
@@ -63,7 +69,8 @@ class ResultComputationService
                     $studentId,
                     $studentResults,
                     $assessmentTypes,
-                    $gradingRules
+                    $gradingRules,
+                    $attendanceMap
                 );
 
                 if ($computed) {
@@ -90,7 +97,8 @@ class ResultComputationService
         int $studentId,
         $studentResults,
         $assessmentTypes,
-        $gradingRules
+        $gradingRules,
+        array $attendanceMap
     ): ?array {
         $subjectGroups = $studentResults->groupBy('subject_id');
 
@@ -136,9 +144,7 @@ class ResultComputationService
         $teacherComment = $this->getAutoTeacherComment($averageScore);
         $principalComment = $this->getAutoPrincipalComment($averageScore);
 
-        $attendancePercentage = $this->getAttendancePercentage($studentId, $schoolClass->id, $exam);
-
-        $position = $this->getStudentPosition($exam, $schoolClass, $averageScore, $studentAverages ?? []);
+        $attendancePercentage = $attendanceMap[$studentId] ?? null;
 
         $reportCard = StudentReportCard::updateOrCreate(
             [
@@ -152,7 +158,7 @@ class ResultComputationService
                 'average_score' => $averageScore,
                 'overall_grade' => $overallGrade,
                 'overall_remark' => $overallRemark,
-                'class_position' => $position,
+                'class_position' => null,
                 'total_subjects' => $totalSubjects,
                 'subjects_passed' => $subjectsPassed,
                 'subjects_failed' => $subjectsFailed,
@@ -192,27 +198,36 @@ class ResultComputationService
         return null;
     }
 
-    private function getAttendancePercentage(int $studentId, int $schoolClassId, Exam $exam): ?float
+    private function batchAttendancePercentages(array $studentIds, int $schoolClassId, Exam $exam): array
     {
+        if (empty($studentIds)) {
+            return [];
+        }
+
         $startDate = $exam->start_date ?? now()->subMonth();
         $endDate = $exam->end_date ?? now();
 
-        $totalDays = Attendance::where('student_id', $studentId)
-            ->where('school_class_id', $schoolClassId)
+        $attendanceData = Attendance::where('school_class_id', $schoolClassId)
             ->whereBetween('attendance_date', [$startDate, $endDate])
-            ->count();
+            ->whereIn('student_id', $studentIds)
+            ->selectRaw('student_id, count(*) as total_days, sum(case when status in ("present","late") then 1 else 0 end) as present_days')
+            ->groupBy('student_id')
+            ->get();
 
-        if ($totalDays === 0) {
-            return null;
+        $result = [];
+        foreach ($attendanceData as $row) {
+            $result[$row->student_id] = $row->total_days > 0
+                ? round(($row->present_days / $row->total_days) * 100, 2)
+                : null;
         }
 
-        $presentDays = Attendance::where('student_id', $studentId)
-            ->where('school_class_id', $schoolClassId)
-            ->whereBetween('attendance_date', [$startDate, $endDate])
-            ->whereIn('status', ['present', 'late'])
-            ->count();
+        foreach ($studentIds as $studentId) {
+            if (! isset($result[$studentId])) {
+                $result[$studentId] = null;
+            }
+        }
 
-        return round(($presentDays / $totalDays) * 100, 2);
+        return $result;
     }
 
     private function getAutoTeacherComment(float $averageScore): string
@@ -245,37 +260,6 @@ class ResultComputationService
         }
     }
 
-    private function getStudentPosition(Exam $exam, SchoolClass $schoolClass, float $averageScore, array $studentAverages): int
-    {
-        $allAverages = StudentReportCard::where('exam_id', $exam->id)
-            ->where('school_class_id', $schoolClass->id)
-            ->pluck('average_score', 'student_id')
-            ->toArray();
-
-        $allAverages = array_merge($allAverages, $studentAverages);
-
-        arsort($allAverages);
-
-        $position = 1;
-        $rank = 1;
-        $previousScore = null;
-
-        foreach ($allAverages as $score) {
-            if ($previousScore !== null && $score < $previousScore) {
-                $rank = $position;
-            }
-
-            if ($score === $averageScore) {
-                return $rank;
-            }
-
-            $position++;
-            $previousScore = $score;
-        }
-
-        return $position;
-    }
-
     private function calculatePositions(Exam $exam, SchoolClass $schoolClass, array $studentAverages): void
     {
         if (empty($studentAverages)) {
@@ -288,19 +272,23 @@ class ResultComputationService
         $position = 1;
         $rank = 1;
         $previousScore = null;
+        $updates = [];
 
         foreach ($sorted as $studentId => $averageScore) {
             if ($previousScore !== null && $averageScore < $previousScore) {
                 $rank = $position;
             }
 
+            $updates[$studentId] = $rank;
+            $position++;
+            $previousScore = $averageScore;
+        }
+
+        foreach ($updates as $studentId => $rank) {
             StudentReportCard::where('exam_id', $exam->id)
                 ->where('student_id', $studentId)
                 ->where('school_class_id', $schoolClass->id)
                 ->update(['class_position' => $rank]);
-
-            $position++;
-            $previousScore = $averageScore;
         }
     }
 

@@ -1,0 +1,55 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — SHADOWS
+   Depth system for cards, dropdowns, modals, and hover states.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------
+   SHADOW SCALE
+   --------------------------------------------------------------- */
+.sb-shadow-none  { box-shadow: none; }
+.sb-shadow-xs    { box-shadow: var(--shadow-xs); }
+.sb-shadow-sm    { box-shadow: var(--shadow-sm); }
+.sb-shadow       { box-shadow: var(--shadow-md); }
+.sb-shadow-md    { box-shadow: var(--shadow-md); }
+.sb-shadow-lg    { box-shadow: var(--shadow-lg); }
+.sb-shadow-xl    { box-shadow: var(--shadow-xl); }
+.sb-shadow-2xl   { box-shadow: var(--shadow-2xl); }
+
+/* ---------------------------------------------------------------
+   SEMANTIC SHADOWS
+   --------------------------------------------------------------- */
+.sb-shadow-dropdown  { box-shadow: var(--shadow-dropdown); }
+.sb-shadow-modal     { box-shadow: var(--shadow-modal); }
+.sb-shadow-card      { box-shadow: var(--shadow-card); }
+.sb-shadow-sidebar   { box-shadow: var(--shadow-sidebar); }
+.sb-shadow-input-focus { box-shadow: var(--shadow-input-focus); }
+
+/* ---------------------------------------------------------------
+   INNER SHADOW
+   --------------------------------------------------------------- */
+.sb-shadow-inner {
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* ---------------------------------------------------------------
+   SHADOW ON HOVER (combine with transition)
+   --------------------------------------------------------------- */
+.sb-shadow-hover {
+    transition: box-shadow var(--duration-fast) var(--ease-default);
+}
+
+.sb-shadow-hover:hover {
+    box-shadow: var(--shadow-card-hover);
+}
+
+/* Elevated card — stronger shadow on hover */
+.sb-elevate {
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--duration-fast) var(--ease-default),
+                transform var(--duration-fast) var(--ease-default);
+}
+
+.sb-elevate:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+}

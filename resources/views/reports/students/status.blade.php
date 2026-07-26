@@ -9,13 +9,13 @@
             <h2>Student Status Breakdown</h2>
             <p class="text-muted mb-0">Enrollment status and gender distribution</p>
         </div>
-        <a href="{{ route('reports.dashboard', array_filter(['school_id' => request('school_id')])) }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Back</a>
+        <a href="{{ route('reports.dashboard', array_filter(['school_id' => request('school_id')])) }}" class="sb-btn sb-btn-secondary">Back</a>
     </div>
 
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
             <div class="card stat-card" style="height: 100%;">
-                <div class="card-body text-center" style="padding: 30px;">
+                <div class="card-body text-center">
                     <p class="stat-number" style="font-size: 32px; color: #0d6efd;">{{ number_format($breakdown['total']) }}</p>
                     <p class="stat-label">Total Students</p>
                 </div>

@@ -13,23 +13,37 @@ use Illuminate\View\View;
 
 class FeeController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     // ── Dashboard ──────────────────────────────────────────
 
     public function dashboard(): View
     {
-        $totalCollected = FeePayment::sum('amount_paid');
-        $totalOutstanding = FeePayment::selectRaw('
-            SUM(fee_structures.amount) - COALESCE(SUM(fee_payments.amount_paid), 0) as total_outstanding
-        ')
+        $schoolId = $this->schoolId();
+
+        $totalCollected = FeePayment::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->sum('amount_paid');
+        $totalOutstanding = FeePayment::when($schoolId, fn ($q) => $q->where('fee_payments.school_id', $schoolId))
+            ->selectRaw('
+                SUM(fee_structures.amount) - COALESCE(SUM(fee_payments.amount_paid), 0) as total_outstanding
+            ')
             ->join('fee_structures', 'fee_payments.fee_structure_id', '=', 'fee_structures.id')
             ->value('total_outstanding') ?? 0;
 
-        $collectionToday = FeePayment::where('payment_date', now()->toDateString())->sum('amount_paid');
-        $collectionThisMonth = FeePayment::whereMonth('payment_date', now()->month)
+        $collectionToday = FeePayment::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->where('payment_date', now()->toDateString())
+            ->sum('amount_paid');
+        $collectionThisMonth = FeePayment::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->whereMonth('payment_date', now()->month)
             ->whereYear('payment_date', now()->year)
             ->sum('amount_paid');
 
         $recentPayments = FeePayment::with('student', 'feeStructure.schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->latest('payment_date')
             ->latest('id')
             ->take(10)
@@ -48,8 +62,11 @@ class FeeController extends Controller
 
     public function feeStructureIndex(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $feeStructures = FeeStructure::query()
             ->with('schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('term', 'like', "%{$search}%")
@@ -62,14 +79,15 @@ class FeeController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $classes = SchoolClass::orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         return view('fees.structures.index', compact('feeStructures', 'classes'));
     }
 
     public function feeStructureCreate(): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         return view('fees.structures.create', compact('classes'));
     }
@@ -99,7 +117,8 @@ class FeeController extends Controller
 
     public function feeStructureEdit(FeeStructure $feeStructure): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         return view('fees.structures.edit', compact('feeStructure', 'classes'));
     }
@@ -144,8 +163,11 @@ class FeeController extends Controller
 
     public function paymentIndex(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $payments = FeePayment::query()
             ->with('student', 'feeStructure.schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('student', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
@@ -172,15 +194,24 @@ class FeeController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $classes = SchoolClass::orderBy('name')->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
 
         return view('fees.payments.index', compact('payments', 'classes'));
     }
 
     public function paymentCreate(Request $request): View
     {
-        $students = Student::with('schoolClass')->where('status', 'active')->orderBy('first_name')->get();
-        $feeStructures = FeeStructure::with('schoolClass')->where('status', true)->orderBy('title')->get();
+        $schoolId = $this->schoolId();
+        $students = Student::with('schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->where('status', 'active')
+            ->orderBy('first_name')
+            ->get();
+        $feeStructures = FeeStructure::with('schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->where('status', true)
+            ->orderBy('title')
+            ->get();
 
         $selectedStudent = $request->student_id ? Student::find($request->student_id) : null;
         $studentFeeStructures = $selectedStudent && $selectedStudent->school_class_id
@@ -189,11 +220,15 @@ class FeeController extends Controller
 
         $outstandingBalances = [];
         if ($selectedStudent) {
+            $paidTotals = FeePayment::where('student_id', $selectedStudent->id)
+                ->whereIn('fee_structure_id', $studentFeeStructures->pluck('id'))
+                ->selectRaw('fee_structure_id, sum(amount_paid) as total_paid')
+                ->groupBy('fee_structure_id')
+                ->pluck('total_paid', 'fee_structure_id');
+
             foreach ($studentFeeStructures as $fs) {
-                $totalPaid = FeePayment::where('student_id', $selectedStudent->id)
-                    ->where('fee_structure_id', $fs->id)
-                    ->sum('amount_paid');
-                $outstandingBalances[$fs->id] = (float) $fs->amount - (float) $totalPaid;
+                $totalPaid = (float) ($paidTotals->get($fs->id) ?? 0);
+                $outstandingBalances[$fs->id] = (float) $fs->amount - $totalPaid;
             }
         }
 
@@ -287,15 +322,19 @@ class FeeController extends Controller
             ->where('status', true)
             ->get();
 
-        $financeData = $feeStructures->map(function ($fs) use ($student) {
-            $totalPaid = FeePayment::where('student_id', $student->id)
-                ->where('fee_structure_id', $fs->id)
-                ->sum('amount_paid');
+        $paidTotals = FeePayment::where('student_id', $student->id)
+            ->whereIn('fee_structure_id', $feeStructures->pluck('id'))
+            ->selectRaw('fee_structure_id, sum(amount_paid) as total_paid')
+            ->groupBy('fee_structure_id')
+            ->pluck('total_paid', 'fee_structure_id');
+
+        $financeData = $feeStructures->map(function ($fs) use ($paidTotals) {
+            $totalPaid = (float) ($paidTotals->get($fs->id) ?? 0);
 
             return [
                 'fee_structure' => $fs,
-                'total_paid' => (float) $totalPaid,
-                'balance' => (float) $fs->amount - (float) $totalPaid,
+                'total_paid' => $totalPaid,
+                'balance' => (float) $fs->amount - $totalPaid,
             ];
         });
 
@@ -323,10 +362,13 @@ class FeeController extends Controller
 
     public function outstandingReport(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
         $selectedClass = $request->class_id;
 
         $students = Student::with('schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->where('status', 'active')
             ->when($selectedClass, function ($query) use ($selectedClass) {
                 $query->where('school_class_id', $selectedClass);
@@ -334,15 +376,25 @@ class FeeController extends Controller
             ->orderBy('first_name')
             ->get();
 
-        $outstandingStudents = $students->map(function ($student) {
-            $feeStructures = FeeStructure::where('school_class_id', $student->school_class_id)
-                ->where('status', true)
-                ->get();
+        $classIds = $students->pluck('school_class_id')->unique();
+        $feeStructuresByClass = FeeStructure::whereIn('school_class_id', $classIds)
+            ->where('status', true)
+            ->get()
+            ->groupBy('school_class_id');
 
+        $allFeeStructureIds = $feeStructuresByClass->flatten()->pluck('id');
+        $paidTotals = FeePayment::whereIn('fee_structure_id', $allFeeStructureIds)
+            ->selectRaw('student_id, fee_structure_id, sum(amount_paid) as total_paid')
+            ->groupBy('student_id', 'fee_structure_id')
+            ->get()
+            ->groupBy('student_id');
+
+        $outstandingStudents = $students->map(function ($student) use ($feeStructuresByClass, $paidTotals) {
+            $feeStructures = $feeStructuresByClass->get($student->school_class_id, collect());
             $totalFees = $feeStructures->sum('amount');
-            $totalPaid = FeePayment::where('student_id', $student->id)
-                ->whereIn('fee_structure_id', $feeStructures->pluck('id'))
-                ->sum('amount_paid');
+
+            $studentPayments = $paidTotals->get($student->id, collect());
+            $totalPaid = $studentPayments->sum('total_paid');
             $balance = (float) $totalFees - (float) $totalPaid;
 
             return [
@@ -362,10 +414,13 @@ class FeeController extends Controller
 
     public function paidReport(Request $request): View
     {
-        $classes = SchoolClass::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->orderBy('name')->get();
         $selectedClass = $request->class_id;
 
         $students = Student::with('schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->where('status', 'active')
             ->when($selectedClass, function ($query) use ($selectedClass) {
                 $query->where('school_class_id', $selectedClass);
@@ -373,18 +428,28 @@ class FeeController extends Controller
             ->orderBy('first_name')
             ->get();
 
-        $paidStudents = $students->filter(function ($student) {
-            $feeStructures = FeeStructure::where('school_class_id', $student->school_class_id)
-                ->where('status', true)
-                ->get();
+        $classIds = $students->pluck('school_class_id')->unique();
+        $feeStructuresByClass = FeeStructure::whereIn('school_class_id', $classIds)
+            ->where('status', true)
+            ->get()
+            ->groupBy('school_class_id');
+
+        $allFeeStructureIds = $feeStructuresByClass->flatten()->pluck('id');
+        $paidTotals = FeePayment::whereIn('fee_structure_id', $allFeeStructureIds)
+            ->selectRaw('student_id, fee_structure_id, sum(amount_paid) as total_paid')
+            ->groupBy('student_id', 'fee_structure_id')
+            ->get()
+            ->groupBy('student_id');
+
+        $paidStudents = $students->filter(function ($student) use ($feeStructuresByClass, $paidTotals) {
+            $feeStructures = $feeStructuresByClass->get($student->school_class_id, collect());
 
             if ($feeStructures->isEmpty()) {
                 return false;
             }
 
-            $totalPaid = FeePayment::where('student_id', $student->id)
-                ->whereIn('fee_structure_id', $feeStructures->pluck('id'))
-                ->sum('amount_paid');
+            $studentPayments = $paidTotals->get($student->id, collect());
+            $totalPaid = $studentPayments->sum('total_paid');
 
             return (float) $totalPaid >= (float) $feeStructures->sum('amount');
         })->values();
@@ -394,40 +459,65 @@ class FeeController extends Controller
 
     public function classSummaryReport(Request $request): View
     {
-        $classes = SchoolClass::withCount(['students' => function ($query) {
-            $query->where('status', 'active');
-        }])->orderBy('name')->get();
+        $schoolId = $this->schoolId();
 
-        $summaries = $classes->map(function ($class) {
-            $feeStructures = FeeStructure::where('school_class_id', $class->id)
-                ->where('status', true)
-                ->get();
+        $classes = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->withCount(['students' => fn ($query) => $query->where('status', 'active')])
+            ->orderBy('name')
+            ->get();
 
+        $classIds = $classes->pluck('id');
+        $feeStructuresByClass = FeeStructure::whereIn('school_class_id', $classIds)
+            ->where('status', true)
+            ->get()
+            ->groupBy('school_class_id');
+
+        $totalCollectedByClass = FeePayment::whereHas('feeStructure', fn ($q) => $q->whereIn('school_class_id', $classIds))
+            ->selectRaw('fee_structures.school_class_id, sum(fee_payments.amount_paid) as total_collected')
+            ->join('fee_structures', 'fee_payments.fee_structure_id', '=', 'fee_structures.id')
+            ->groupBy('fee_structures.school_class_id')
+            ->pluck('total_collected', 'school_class_id');
+
+        $studentIdsByClass = [];
+        foreach ($classes as $class) {
+            $studentIdsByClass[$class->id] = Student::where('school_class_id', $class->id)
+                ->where('status', 'active')
+                ->pluck('id');
+        }
+
+        $allStudentIds = $studentIdsByClass ? collect($studentIdsByClass)->flatten() : collect();
+        $paidTotalsByStudent = FeePayment::whereIn('student_id', $allStudentIds)
+            ->selectRaw('student_id, fee_structure_id, sum(amount_paid) as total_paid')
+            ->groupBy('student_id', 'fee_structure_id')
+            ->get()
+            ->groupBy('student_id');
+
+        $summaries = $classes->map(function ($class) use ($feeStructuresByClass, $totalCollectedByClass, $studentIdsByClass, $paidTotalsByStudent) {
+            $feeStructures = $feeStructuresByClass->get($class->id, collect());
             $totalExpected = $feeStructures->sum('amount') * $class->students_count;
-            $totalCollected = FeePayment::whereHas('feeStructure', function ($q) use ($class) {
-                $q->where('school_class_id', $class->id);
-            })->sum('amount_paid');
+            $totalCollected = (float) ($totalCollectedByClass->get($class->id) ?? 0);
 
-            $studentIds = $class->students()->where('status', 'active')->pluck('id');
+            $studentIds = $studentIdsByClass[$class->id] ?? collect();
+            $totalFeeAmount = (float) $feeStructures->sum('amount');
             $studentsWithFullPayment = 0;
 
-            foreach ($studentIds as $studentId) {
-                $studentPaid = FeePayment::where('student_id', $studentId)
-                    ->whereHas('feeStructure', function ($q) use ($class) {
-                        $q->where('school_class_id', $class->id);
-                    })
-                    ->sum('amount_paid');
+            if ($totalFeeAmount > 0) {
+                foreach ($studentIds as $studentId) {
+                    $studentPayments = $paidTotalsByStudent->get($studentId, collect())
+                        ->filter(fn ($p) => $feeStructures->pluck('id')->contains($p->fee_structure_id));
+                    $studentPaid = (float) $studentPayments->sum('total_paid');
 
-                if ((float) $studentPaid >= (float) $feeStructures->sum('amount')) {
-                    $studentsWithFullPayment++;
+                    if ($studentPaid >= $totalFeeAmount) {
+                        $studentsWithFullPayment++;
+                    }
                 }
             }
 
             return [
                 'class' => $class,
                 'total_expected' => (float) $totalExpected,
-                'total_collected' => (float) $totalCollected,
-                'outstanding' => (float) $totalExpected - (float) $totalCollected,
+                'total_collected' => $totalCollected,
+                'outstanding' => (float) $totalExpected - $totalCollected,
                 'collection_rate' => $totalExpected > 0 ? round(($totalCollected / $totalExpected) * 100, 1) : 0,
                 'students_fully_paid' => $studentsWithFullPayment,
                 'students_with_balance' => $class->students_count - $studentsWithFullPayment,
@@ -439,9 +529,11 @@ class FeeController extends Controller
 
     public function dailyCollectionsReport(Request $request): View
     {
+        $schoolId = $this->schoolId();
         $date = $request->date ?? now()->toDateString();
 
         $payments = FeePayment::with('student', 'feeStructure.schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->where('payment_date', $date)
             ->latest('id')
             ->get();
@@ -461,11 +553,13 @@ class FeeController extends Controller
 
     public function monthlyCollectionsReport(Request $request): View
     {
+        $schoolId = $this->schoolId();
         $month = $request->month ?? now()->format('Y-m');
         $startDate = now()->parse($month)->startOfMonth()->toDateString();
         $endDate = now()->parse($month)->endOfMonth()->toDateString();
 
         $payments = FeePayment::with('student', 'feeStructure.schoolClass')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->whereBetween('payment_date', [$startDate, $endDate])
             ->latest('payment_date')
             ->latest('id')

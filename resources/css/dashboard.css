@@ -1,0 +1,1775 @@
+/* ==========================================================================
+   SKULBASE DASHBOARD COMPONENTS — Phase 23.3.1
+   Enterprise-grade dashboard UI. Premium SaaS appearance.
+   Uses design-system variables for consistency.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------
+   HERO SECTION — Premium Gradient Banner
+   --------------------------------------------------------------- */
+.ds-hero {
+    background: linear-gradient(135deg, #4F1DFF 0%, #6C2BFF 30%, #7B2CFF 60%, #8A2BE2 100%);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8) var(--space-8);
+    color: var(--white);
+    margin-bottom: var(--space-6);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 40px -8px rgba(79,29,255,0.35), 0 4px 20px -4px rgba(79,29,255,0.2);
+    min-height: 220px;
+}
+
+.ds-hero--platform {
+    background: linear-gradient(135deg, #4F1DFF 0%, #5B21FF 30%, #6C2BFF 60%, #7B2CFF 100%);
+}
+
+.ds-hero--school {
+    background: linear-gradient(135deg, #4F1DFF 0%, #6C2BFF 30%, #7B2CFF 60%, #8A2BE2 100%);
+}
+
+.ds-hero-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ds-hero-bg-orb--1 {
+    top: -80px;
+    right: -60px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 65%);
+}
+
+.ds-hero-bg-orb--2 {
+    bottom: -60px;
+    left: -40px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%);
+}
+
+.ds-hero-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.ds-hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    gap: var(--space-8);
+}
+
+.ds-hero-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ds-hero-greeting {
+    font-size: var(--font-size-xs);
+    opacity: 0.7;
+    margin: 0 0 var(--space-2) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: var(--font-weight-semibold);
+}
+
+.ds-hero-title {
+    font-size: 40px;
+    font-weight: 800;
+    margin: 0 0 var(--space-2) 0;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.15);
+}
+
+.ds-hero-motto {
+    font-size: var(--font-size-sm);
+    opacity: 0.6;
+    margin: 0 0 var(--space-2) 0;
+    font-style: italic;
+}
+
+.ds-hero-subtitle {
+    font-size: 18px;
+    opacity: 0.8;
+    margin: 0 0 var(--space-5) 0;
+    max-width: 500px;
+    line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+}
+
+.ds-hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.ds-hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    color: rgba(255,255,255,0.9);
+}
+
+.ds-hero-chip-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ds-hero-chip-dot--green { background: #34D399; box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+.ds-hero-chip-dot--yellow { background: #FBBF24; box-shadow: 0 0 8px rgba(251,191,36,0.5); }
+.ds-hero-chip-dot--red { background: #F87171; box-shadow: 0 0 8px rgba(248,113,113,0.5); }
+
+.ds-hero-chip--badge { font-weight: 600; }
+.ds-hero-chip--trial { background: rgba(255,193,7,0.2); border-color: rgba(255,193,7,0.3); }
+.ds-hero-chip--active { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.3); }
+.ds-hero-chip--grace { background: rgba(255,133,20,0.2); border-color: rgba(255,133,20,0.3); }
+.ds-hero-chip--expired { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.3); }
+
+.ds-hero-visual {
+    flex-shrink: 0;
+    position: relative;
+    width: 280px;
+    height: 200px;
+}
+
+.ds-hero-illustration {
+    width: 100%;
+    height: 100%;
+}
+
+.ds-hero-illustration svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.15));
+}
+
+.ds-hero-glass {
+    position: absolute;
+    bottom: 8px;
+    right: -8px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius-lg);
+    padding: 10px 16px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.ds-hero-glass-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ds-hero-glass-inner svg {
+    width: 20px;
+    height: 20px;
+    color: #34D399;
+    filter: none;
+}
+
+.ds-hero-glass-value {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    display: block;
+    line-height: 1.2;
+}
+
+.ds-hero-glass-label {
+    font-size: 11px;
+    opacity: 0.7;
+    display: block;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* ---------------------------------------------------------------
+   STAT CARD — Premium KPI Cards
+   --------------------------------------------------------------- */
+.ds-stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.ds-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: transparent;
+    transition: background 0.3s ease;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.ds-stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(180deg, rgba(91,33,255,0.03) 0%, transparent 100%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ds-stat-card:hover {
+    border-color: rgba(91, 33, 255, 0.12);
+    box-shadow: 0 12px 48px -10px rgba(91,33,255,0.12), 0 6px 16px -4px rgba(0,0,0,0.05), 0 0 0 1px rgba(91,33,255,0.06);
+    transform: translateY(-4px);
+}
+
+.ds-stat-card:hover::before {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-400) 100%);
+}
+
+.ds-stat-card:hover::after {
+    opacity: 1;
+}
+
+.ds-stat-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.ds-stat-card-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+    line-height: var(--line-height-normal);
+}
+
+.ds-stat-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background: linear-gradient(135deg, rgba(91,33,255,0.08) 0%, rgba(91,33,255,0.04) 100%);
+    border: 1px solid rgba(91,33,255,0.08);
+}
+
+.ds-stat-card-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ds-stat-card:hover .ds-stat-card-icon {
+    transform: scale(1.08);
+}
+
+.ds-stat-card:hover .ds-stat-card-icon::after {
+    opacity: 1;
+}
+
+.ds-stat-card-value {
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+    line-height: 1.1;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.03em;
+}
+
+.ds-stat-card-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+}
+
+.ds-stat-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.ds-stat-change-up {
+    color: var(--success-dark);
+    background: var(--success-light);
+}
+
+.ds-stat-change-down {
+    color: var(--danger-dark);
+    background: var(--danger-light);
+}
+
+.ds-stat-change-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.ds-stat-desc {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------
+   CHART CARD
+   --------------------------------------------------------------- */
+.ds-chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.ds-chart-card:hover {
+    box-shadow: 0 8px 24px -4px rgba(0,0,0,0.06), 0 4px 8px -2px rgba(0,0,0,0.03);
+    border-color: rgba(91,33,255,0.08);
+}
+
+.ds-chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6) 0;
+    gap: var(--space-4);
+}
+
+.ds-chart-card-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-heading);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.ds-chart-card-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: var(--space-1) 0 0;
+}
+
+.ds-chart-card-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.ds-chart-card-body {
+    padding: var(--space-4) var(--space-6) var(--space-5);
+    position: relative;
+}
+
+.ds-chart-card-body canvas {
+    max-width: 100%;
+}
+
+.ds-chart-skeleton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* ---------------------------------------------------------------
+   WIDGET CARD
+   --------------------------------------------------------------- */
+.ds-widget-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.ds-widget-card:hover {
+    box-shadow: 0 8px 24px -4px rgba(0,0,0,0.06), 0 4px 8px -2px rgba(0,0,0,0.03);
+    border-color: rgba(91,33,255,0.08);
+}
+
+.ds-widget-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6) 0;
+}
+
+.ds-widget-card-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-heading);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.ds-widget-card-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: var(--space-1) 0 0;
+}
+
+.ds-widget-card-link {
+    font-size: var(--font-size-sm);
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--ease-default);
+}
+
+.ds-widget-card-link:hover {
+    color: var(--primary-hover);
+}
+
+.ds-widget-card-body {
+    padding: var(--space-4) var(--space-6) var(--space-5);
+}
+
+.ds-widget-card-body--flush {
+    padding: 0;
+}
+
+/* ---------------------------------------------------------------
+   QUICK ACTIONS — Premium Button Grid
+   --------------------------------------------------------------- */
+.ds-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-3);
+}
+
+.ds-quick-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-3);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-body);
+    background: var(--gray-50);
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+}
+
+.ds-quick-action:hover {
+    background: var(--card);
+    border-color: rgba(91, 33, 255, 0.2);
+    color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -6px rgba(91,33,255,0.12), 0 2px 8px -2px rgba(91,33,255,0.06);
+}
+
+.ds-quick-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(91,33,255,0.06) 0%, rgba(91,33,255,0.02) 100%);
+}
+
+.ds-quick-action:hover .ds-quick-action-icon {
+    transform: scale(1.08);
+}
+
+.ds-quick-action-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-tight);
+}
+
+/* ---------------------------------------------------------------
+   ACTIVITY TIMELINE — Enhanced
+   --------------------------------------------------------------- */
+.ds-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.ds-timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--divider);
+}
+
+.ds-timeline-item:last-child {
+    border-bottom: none;
+}
+
+.ds-timeline-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.ds-timeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.ds-timeline-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.ds-timeline-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-body);
+    margin: 0;
+    line-height: var(--line-height-snug);
+}
+
+.ds-timeline-time {
+    font-size: var(--font-size-xs);
+    color: var(--text-disabled);
+    margin-top: 2px;
+    display: block;
+}
+
+/* ---------------------------------------------------------------
+   EMPTY STATE — Professional
+   --------------------------------------------------------------- */
+.ds-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12) var(--space-6);
+    text-align: center;
+}
+
+.ds-empty-state--sm {
+    padding: var(--space-8) var(--space-4);
+}
+
+.ds-empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--space-4);
+    color: var(--text-disabled);
+    opacity: 0.3;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ds-empty-state--sm .ds-empty-state-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.ds-empty-state-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-heading);
+    margin-bottom: var(--space-2);
+}
+
+.ds-empty-state-message {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    max-width: 320px;
+    margin: 0;
+    line-height: var(--line-height-relaxed);
+}
+
+/* ---------------------------------------------------------------
+   SKELETON LOADING STATES
+   --------------------------------------------------------------- */
+.ds-skeleton {
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+    background-size: 200% 100%;
+    animation: ds-skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-md);
+}
+
+@keyframes ds-skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.ds-skeleton-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-bottom: var(--space-3);
+}
+
+.ds-skeleton-circle-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ds-skeleton-heading {
+    height: 20px;
+    width: 60%;
+    margin-bottom: var(--space-3);
+}
+
+.ds-skeleton-text {
+    height: 14px;
+    margin-bottom: var(--space-2);
+}
+
+.ds-skeleton-text-sm {
+    height: 12px;
+    margin-top: var(--space-1);
+}
+
+.ds-skeleton-chart {
+    height: 200px;
+    width: 100%;
+    border-radius: var(--radius-lg);
+}
+
+.ds-skeleton-card {
+    padding: var(--space-5);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.ds-skeleton-chart-wrap {
+    padding: var(--space-5);
+}
+
+.ds-skeleton-row {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+}
+
+.ds-skeleton-bar {
+    flex: 1;
+    border-radius: var(--radius-md);
+}
+
+.ds-skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ds-skeleton-list-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.ds-skeleton-list-text {
+    flex: 1;
+}
+
+/* ---------------------------------------------------------------
+   CALENDAR / EVENT WIDGET
+   --------------------------------------------------------------- */
+.ds-event-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--divider);
+}
+
+.ds-event-item:last-child {
+    border-bottom: none;
+}
+
+.ds-event-date-box {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--primary-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ds-event-day {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    line-height: 1;
+}
+
+.ds-event-month {
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ds-event-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.ds-event-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-heading);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ds-event-desc {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   SCHOOL LIST (Super Admin)
+   --------------------------------------------------------------- */
+.ds-school-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--divider);
+}
+
+.ds-school-item:last-child {
+    border-bottom: none;
+}
+
+.ds-school-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+}
+
+.ds-school-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.ds-school-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.ds-school-meta {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+/* ---------------------------------------------------------------
+   CHILD CARD (Parent)
+   --------------------------------------------------------------- */
+.ds-child-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+}
+
+.ds-child-card:hover {
+    border-color: transparent;
+    box-shadow: 0 8px 30px -8px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.ds-child-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.ds-child-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.ds-child-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.ds-child-detail {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+.ds-child-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.ds-child-stat {
+    padding: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.ds-child-stat-value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+    line-height: 1;
+}
+
+.ds-child-stat-label {
+    font-size: 10px;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+}
+
+.ds-child-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.ds-child-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.2s ease;
+}
+
+.ds-child-link:hover {
+    background: var(--card);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateX(2px);
+}
+
+.ds-child-link-arrow {
+    color: var(--text-disabled);
+    font-size: var(--font-size-xs);
+    transition: transform 0.2s ease;
+}
+
+.ds-child-link:hover .ds-child-link-arrow {
+    transform: translateX(3px);
+    color: var(--primary);
+}
+
+/* ---------------------------------------------------------------
+   REPORT CARD HIGHLIGHT (Student)
+   --------------------------------------------------------------- */
+.ds-report-highlight {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--gray-50) 100%);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+}
+
+.ds-report-highlight-info {
+    min-width: 0;
+}
+
+.ds-report-highlight-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.ds-report-highlight-detail {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ---------------------------------------------------------------
+   RESULT ITEM
+   --------------------------------------------------------------- */
+.ds-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.ds-result-item:last-child {
+    margin-bottom: 0;
+}
+
+.ds-result-item:hover {
+    background: var(--card);
+    border-color: var(--border-hover);
+}
+
+.ds-result-item-info {
+    min-width: 0;
+}
+
+.ds-result-item-subject {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.ds-result-item-meta {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+.ds-result-item-score {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+}
+
+.ds-result-item-score--high { color: var(--success); }
+.ds-result-item-score--mid { color: var(--warning); }
+.ds-result-item-score--low { color: var(--danger); }
+
+/* ---------------------------------------------------------------
+   ASSISTANT CLASS/RESULT LIST ITEM
+   --------------------------------------------------------------- */
+.ds-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.ds-list-item:last-child {
+    margin-bottom: 0;
+}
+
+.ds-list-item:hover {
+    background: var(--card);
+    border-color: var(--border-hover);
+}
+
+.ds-list-item-info {
+    min-width: 0;
+}
+
+.ds-list-item-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.ds-list-item-meta {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+.ds-list-item-value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-body);
+    flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------
+   DASHBOARD GRID HELPERS
+   --------------------------------------------------------------- */
+.ds-dashboard-grid {
+    display: grid;
+    gap: var(--space-6);
+}
+
+.ds-dashboard-grid--2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.ds-dashboard-grid--3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.ds-dashboard-grid--main {
+    grid-template-columns: 2fr 1fr;
+}
+
+.ds-dashboard-grid--main-reverse {
+    grid-template-columns: 1fr 2fr;
+}
+
+.ds-dashboard-grid--full {
+    grid-template-columns: 1fr;
+}
+
+.ds-dashboard-grid--sidebar {
+    grid-template-columns: 1fr 340px;
+}
+
+/* ---------------------------------------------------------------
+   SIDEBAR PREMIUM ENHANCEMENTS
+   --------------------------------------------------------------- */
+.sb-sidebar-link {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sb-sidebar-link.active {
+    background: linear-gradient(135deg, rgba(91,33,255,0.25) 0%, rgba(91,33,255,0.15) 100%);
+    border-radius: var(--radius-lg);
+    color: var(--white) !important;
+    font-weight: var(--font-weight-medium);
+    position: relative;
+}
+
+.sb-sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--primary);
+    border-radius: 0 2px 2px 0;
+}
+
+.sb-sidebar-link:hover {
+    background: rgba(255,255,255,0.06);
+    border-radius: var(--radius-lg);
+}
+
+/* ---------------------------------------------------------------
+   SEARCH BAR ENHANCEMENTS
+   --------------------------------------------------------------- */
+.sb-topbar-search {
+    transition: all 0.25s ease;
+}
+
+.sb-topbar-search:focus-within {
+    box-shadow: 0 0 0 3px rgba(91,33,255,0.1);
+    border-radius: var(--radius-lg);
+}
+
+/* ---------------------------------------------------------------
+   USER PROFILE DROPDOWN ENHANCEMENTS
+   --------------------------------------------------------------- */
+.sb-topbar-profile {
+    transition: all 0.2s ease;
+}
+
+.sb-topbar-profile:hover {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+}
+
+/* ---------------------------------------------------------------
+   ONLINE INDICATOR
+   --------------------------------------------------------------- */
+.ds-online-indicator {
+    position: relative;
+    display: inline-block;
+}
+
+.ds-online-indicator::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    border: 2px solid var(--white);
+}
+
+/* ---------------------------------------------------------------
+   ANNOUNCEMENTS LIST
+   --------------------------------------------------------------- */
+.ds-announcement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--divider);
+}
+
+.ds-announcement-item:last-child {
+    border-bottom: none;
+}
+
+.ds-announcement-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--primary);
+}
+
+.ds-announcement-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.ds-announcement-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-heading);
+    margin: 0;
+}
+
+.ds-announcement-meta {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+/* ---------------------------------------------------------------
+    ACADEMIC OVERVIEW (School Admin)
+    --------------------------------------------------------------- */
+.ds-academic-overview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ds-academic-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.ds-academic-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+.ds-academic-value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+}
+
+.ds-academic-value--highlight {
+    color: var(--primary);
+    font-size: var(--font-size-lg);
+}
+
+/* ---------------------------------------------------------------
+    NOTIFICATION SUMMARY (School Admin Sidebar)
+    --------------------------------------------------------------- */
+.ds-notification-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.ds-notification-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-body);
+    border: 1px solid var(--border);
+    background: var(--gray-50);
+    transition: all 0.2s ease;
+}
+
+.ds-notification-item:hover {
+    background: var(--card);
+    border-color: var(--primary);
+    color: var(--text-heading);
+    transform: translateX(2px);
+}
+
+.ds-notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ds-notification-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    flex: 1;
+    min-width: 0;
+}
+
+.ds-notification-count {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 2px 10px;
+    flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------
+    SIDEBAR STACK (School Admin)
+    --------------------------------------------------------------- */
+.ds-dashboard-sidebar-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* ---------------------------------------------------------------
+    TIMETABLE LIST (Teacher)
+    --------------------------------------------------------------- */
+.ds-timetable-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ds-timetable-slot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+
+.ds-timetable-slot:hover {
+    background: var(--card);
+    border-color: var(--border-hover);
+}
+
+.ds-timetable-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.ds-timetable-period-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary);
+}
+
+.ds-timetable-period-time {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.ds-timetable-divider {
+    width: 2px;
+    height: 36px;
+    background: var(--border);
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.ds-timetable-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.ds-timetable-subject {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-heading);
+}
+
+.ds-timetable-class {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+@media (max-width: 767.98px) {
+    .ds-timetable-slot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+    .ds-timetable-divider {
+        width: 100%;
+        height: 1px;
+    }
+    .ds-timetable-time {
+        flex-direction: row;
+        gap: var(--space-2);
+        min-width: 0;
+    }
+}
+
+/* ---------------------------------------------------------------
+   RESPONSIVE BREAKPOINTS
+   --------------------------------------------------------------- */
+@media (max-width: 991.98px) {
+    .ds-dashboard-grid--2,
+    .ds-dashboard-grid--3,
+    .ds-dashboard-grid--main,
+    .ds-dashboard-grid--main-reverse,
+    .ds-dashboard-grid--sidebar {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .ds-welcome-banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ds-welcome-banner-meta {
+        align-items: flex-start;
+        width: 100%;
+    }
+    .ds-welcome-banner {
+        padding: var(--space-6);
+    }
+    .ds-welcome-status-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+    .ds-quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .ds-child-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    .ds-stat-card {
+        padding: var(--space-5);
+    }
+    .ds-stat-card-value {
+        font-size: 1.75rem;
+    }
+    .ds-notification-summary {
+        grid-template-columns: 1fr;
+    }
+    .ds-dashboard-sidebar-stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+}
+
+/* ---------------------------------------------------------------
+   PHASE 23.3.6 — UX REFINEMENTS
+   Entry animations, accessibility, micro-interactions.
+   --------------------------------------------------------------- */
+
+/* ── Entry Animations ──────────────────────────────── */
+@keyframes ds-fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ds-animate-in {
+    animation: ds-fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ds-animate-in:nth-child(1) { animation-delay: 0ms; }
+.ds-animate-in:nth-child(2) { animation-delay: 50ms; }
+.ds-animate-in:nth-child(3) { animation-delay: 100ms; }
+.ds-animate-in:nth-child(4) { animation-delay: 150ms; }
+.ds-animate-in:nth-child(5) { animation-delay: 200ms; }
+.ds-animate-in:nth-child(6) { animation-delay: 250ms; }
+
+/* ── Reduced Motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .ds-animate-in {
+        animation: none;
+    }
+    .ds-stat-card,
+    .ds-child-card,
+    .ds-quick-action,
+    .ds-widget-card {
+        transition: none;
+    }
+    .ds-stat-card:hover,
+    .ds-child-card:hover,
+    .ds-quick-action:hover {
+        transform: none;
+    }
+    .ds-skeleton {
+        animation: none;
+    }
+}
+
+/* ── Focus States (Accessibility) ──────────────────── */
+.ds-stat-card:focus-visible,
+.ds-quick-action:focus-visible,
+.ds-child-link:focus-visible,
+.ds-widget-card-link:focus-visible,
+.ds-child-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-lg);
+}
+
+.ds-quick-action:focus-visible {
+    outline-offset: 0;
+}
+
+/* ── Touch Targets (≥44px) ─────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+    .ds-quick-action {
+        min-height: 44px;
+        padding: var(--space-4) var(--space-3);
+    }
+    .ds-child-link {
+        min-height: 44px;
+        padding: var(--space-3) var(--space-4);
+    }
+    .ds-list-item {
+        min-height: 44px;
+    }
+}
+
+/* ── Hover Lift for List Items ──────────────────────── */
+.ds-list-item {
+    transition: background-color 0.15s ease;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-2);
+    margin: 0 calc(var(--space-2) * -1);
+}
+
+.ds-list-item:hover {
+    background: var(--gray-50);
+}
+
+/* ── Event Item Hover ──────────────────────────────── */
+.ds-event-item {
+    transition: background-color 0.15s ease;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-2);
+    margin: 0 calc(var(--space-2) * -1);
+}
+
+.ds-event-item:hover {
+    background: var(--gray-50);
+}
+
+/* ── Result Item Hover ─────────────────────────────── */
+.ds-result-item {
+    transition: background-color 0.15s ease;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-2);
+    margin: 0 calc(var(--space-2) * -1);
+}
+
+.ds-result-item:hover {
+    background: var(--gray-50);
+}
+
+/* ── Welcome Banner Pulse ──────────────────────────── */
+@keyframes ds-status-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.ds-welcome-status-dot--green {
+    animation: ds-status-pulse 2s ease-in-out infinite;
+}
+
+/* ── Chart Card Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+    .ds-chart-card-header {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    .ds-chart-card-body {
+        padding: var(--space-3) var(--space-4) var(--space-4);
+    }
+    .ds-chart-card-body canvas {
+        max-height: 220px;
+    }
+}
+
+/* ── Notification Summary Responsive ───────────────── */
+.ds-notification-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+}
+
+.ds-notification-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s ease;
+}
+
+.ds-notification-item:hover {
+    background: var(--card);
+}
+
+.ds-notification-count {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+    line-height: 1;
+}
+
+.ds-notification-count small {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+/* ── Dashboard Sidebar Stack ───────────────────────── */
+.ds-dashboard-sidebar-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* ── Academic Overview ─────────────────────────────── */
+.ds-academic-overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+}
+
+.ds-academic-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.ds-academic-item-value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-heading);
+}
+
+.ds-academic-item-label {
+    font-size: 10px;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .ds-academic-overview {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------------------------------------------------------------
+   PHASE 23.4 — COMPONENT UTILITIES
+   Animations for toasts, spinners, dropdowns.
+   --------------------------------------------------------------- */
+
+@keyframes sb-slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes sb-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes sb-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sb-scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.sb-btn-spinner {
+    animation: sb-spin 0.6s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ── Responsive: Quick Actions Grid ────────────────── */
+@media (max-width: 575.98px) {
+    .ds-quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-2);
+    }
+    .ds-quick-action {
+        padding: var(--space-3) var(--space-2);
+    }
+    .ds-quick-action-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ── Print Styles ──────────────────────────────────── */
+@media print {
+    .sb-topbar,
+    .sb-sidebar,
+    .sb-footer,
+    .sb-topbar-toggle {
+        display: none !important;
+    }
+    .sb-main-content {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+        padding: 0 !important;
+    }
+    .stat-card, .ds-stat-card, .sb-card, .sb-stat-card {
+        break-inside: avoid;
+    }
+}

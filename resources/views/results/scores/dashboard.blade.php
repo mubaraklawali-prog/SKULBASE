@@ -10,59 +10,59 @@
             <p class="text-muted mb-0">Overview of student score entries</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('results.scores.create') }}" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Enter Scores</a>
-            <a href="{{ route('results.scores.history') }}" class="btn" style="background: #0a1628; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">View History</a>
+            <a href="{{ route('results.scores.create') }}" class="sb-btn sb-btn-primary">Enter Scores</a>
+            <a href="{{ route('results.scores.history') }}" class="sb-btn sb-btn-dark">View History</a>
         </div>
     </div>
 
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="card stat-card" style="height: 100%;">
+            <div class="card stat-card h-100">
                 <div class="card-body d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: #e7f1ff; color: #0d6efd;">
+                    <div class="stat-icon sb-stat-icon-excused">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
                     <div>
-                        <p class="stat-number" style="color: #0d6efd;">{{ number_format($totalEntries) }}</p>
+                        <p class="stat-number sb-stat-number-excused">{{ number_format($totalEntries) }}</p>
                         <p class="stat-label">Total Score Entries</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card stat-card" style="height: 100%;">
+            <div class="card stat-card h-100">
                 <div class="card-body d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: #d1e7dd; color: #0f5132;">
+                    <div class="stat-icon sb-stat-icon-present">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
                     </div>
                     <div>
-                        <p class="stat-number" style="color: #0f5132;">{{ $examsWithScores }}</p>
+                        <p class="stat-number sb-stat-number-present">{{ $examsWithScores }}</p>
                         <p class="stat-label">Exams with Scores</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card stat-card" style="height: 100%;">
+            <div class="card stat-card h-100">
                 <div class="card-body d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: #fff3cd; color: #664d03;">
+                    <div class="stat-icon sb-stat-icon-late">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                     </div>
                     <div>
-                        <p class="stat-number" style="color: #664d03;">{{ $subjectsWithScores }}</p>
+                        <p class="stat-number sb-stat-number-late">{{ $subjectsWithScores }}</p>
                         <p class="stat-label">Subjects with Scores</p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <div class="card stat-card" style="height: 100%;">
+            <div class="card stat-card h-100">
                 <div class="card-body d-flex align-items-center gap-3">
-                    <div class="stat-icon" style="background: #f8d7da; color: #842029;">
+                    <div class="stat-icon sb-stat-icon-absent">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div>
-                        <p class="stat-number" style="color: #842029;">{{ $pendingEntries }}</p>
+                        <p class="stat-number sb-stat-number-absent">{{ $pendingEntries }}</p>
                         <p class="stat-label">Pending Entries</p>
                     </div>
                 </div>
@@ -74,31 +74,31 @@
         <div class="col-md-8 mb-3">
             <div class="card stat-card">
                 <div class="card-body">
-                    <h5 style="font-weight: 600; margin-bottom: 16px; color: #1a1a2e;">Recent Score Entries</h5>
+                    <h5 class="fw-semibold mb-3">Recent Score Entries</h5>
                     @if($recentEntries->isEmpty())
-                        <p class="text-muted" style="margin: 0;">No score entries yet. <a href="{{ route('results.scores.create') }}" style="color: #4f9cf7; text-decoration: none;">Enter scores now</a></p>
+                        <p class="text-muted mb-0">No score entries yet. <a href="{{ route('results.scores.create') }}" class="sb-link">Enter scores now</a></p>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover mb-0 sb-table">
                                 <thead>
-                                    <tr style="background: #f8f9fa;">
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Student</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Class</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Subject</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Exam</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Assessment</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Score</th>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Class</th>
+                                        <th>Subject</th>
+                                        <th>Exam</th>
+                                        <th>Assessment</th>
+                                        <th>Score</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($recentEntries as $entry)
                                         <tr>
-                                            <td style="padding: 12px 16px; font-weight: 500;">{{ $entry->student->full_name ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $entry->schoolClass->name ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $entry->subject->name ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $entry->exam->name ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $entry->assessmentType->name ?? '—' }}</td>
-                                            <td style="padding: 12px 16px; font-weight: 600;">{{ $entry->score }}%</td>
+                                            <td class="fw-medium">{{ $entry->student->full_name ?? '—' }}</td>
+                                            <td class="text-muted">{{ $entry->schoolClass->name ?? '—' }}</td>
+                                            <td class="text-muted">{{ $entry->subject->name ?? '—' }}</td>
+                                            <td class="text-muted">{{ $entry->exam->name ?? '—' }}</td>
+                                            <td class="text-muted">{{ $entry->assessmentType->name ?? '—' }}</td>
+                                            <td class="fw-semibold">{{ $entry->score }}%</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -112,7 +112,7 @@
         <div class="col-md-4 mb-3">
             <div class="card stat-card">
                 <div class="card-body">
-                    <h5 style="font-weight: 600; margin-bottom: 16px; color: #1a1a2e;">Quick Actions</h5>
+                    <h5 class="fw-semibold mb-3">Quick Actions</h5>
                     <div class="d-flex flex-column gap-2">
                         <a href="{{ route('results.scores.create') }}" class="action-link">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -147,27 +147,27 @@
     @if($topScorers->isNotEmpty())
         <div class="card stat-card">
             <div class="card-body">
-                <h5 style="font-weight: 600; margin-bottom: 16px; color: #1a1a2e;">Top Performers</h5>
+                <h5 class="fw-semibold mb-3">Top Performers</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover mb-0 sb-table">
                         <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">#</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Student</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Average Score</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Action</th>
+                            <tr>
+                                <th>#</th>
+                                <th>Student</th>
+                                <th>Average Score</th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($topScorers as $index => $scorer)
                                 <tr>
-                                    <td style="padding: 12px 16px; color: #6c757d;">{{ $index + 1 }}</td>
-                                    <td style="padding: 12px 16px; font-weight: 500;">{{ $scorer->student->full_name ?? '—' }}</td>
-                                    <td style="padding: 12px 16px;">
-                                        <span style="background: {{ $scorer->avg_score >= 70 ? '#d1e7dd' : ($scorer->avg_score >= 50 ? '#fff3cd' : '#f8d7da') }}; color: {{ $scorer->avg_score >= 70 ? '#0f5132' : ($scorer->avg_score >= 50 ? '#664d03' : '#842029') }}; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">{{ number_format($scorer->avg_score, 1) }}%</span>
+                                    <td class="text-muted">{{ $index + 1 }}</td>
+                                    <td class="fw-medium">{{ $scorer->student->full_name ?? '—' }}</td>
+                                    <td>
+                                        <span class="sb-badge {{ $scorer->avg_score >= 70 ? 'sb-badge-present' : ($scorer->avg_score >= 50 ? 'sb-badge-late' : 'sb-badge-absent') }}">{{ number_format($scorer->avg_score, 1) }}%</span>
                                     </td>
-                                    <td style="padding: 12px 16px; text-align: right;">
-                                        <a href="{{ route('results.scores.student-report', $scorer->student) }}" style="color: #4f9cf7; font-weight: 500; text-decoration: none; font-size: 13px;">View Report</a>
+                                    <td class="text-end">
+                                        <a href="{{ route('results.scores.student-report', $scorer->student) }}" class="sb-link">View Report</a>
                                     </td>
                                 </tr>
                             @endforeach

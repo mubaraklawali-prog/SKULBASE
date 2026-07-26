@@ -10,10 +10,10 @@
             <p class="text-muted mb-0">Subject details and assigned classes</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('subjects.edit', $subject) }}" class="btn" style="background: #e7f1ff; color: #0d6efd; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+            <a href="{{ route('subjects.edit', $subject) }}" class="sb-btn sb-btn-outline-primary">
                 Edit Subject
             </a>
-            <a href="{{ route('subjects.index') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+            <a href="{{ route('subjects.index') }}" class="sb-btn sb-btn-secondary">
                 Back to List
             </a>
         </div>
@@ -26,15 +26,15 @@
                     <h5 style="font-weight: 600; margin-bottom: 20px; color: #1a1a2e;">Subject Information</h5>
 
                     <div class="mb-3">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Name</label>
+                        <label class="sb-form-label">Name</label>
                         <p style="margin: 0; font-size: 15px; font-weight: 500; color: #333;">{{ $subject->name }}</p>
                     </div>
 
                     <div class="mb-3">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Code</label>
+                        <label class="sb-form-label">Code</label>
                         <p style="margin: 0; font-size: 15px; color: #333;">
                             @if($subject->code)
-                                <code style="background: #f0f2f5; padding: 4px 10px; border-radius: 4px; font-size: 14px;">{{ $subject->code }}</code>
+                                <code>{{ $subject->code }}</code>
                             @else
                                 <span style="color: #6c757d;">Not set</span>
                             @endif
@@ -42,23 +42,23 @@
                     </div>
 
                     <div class="mb-3">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">School</label>
+                        <label class="sb-form-label">School</label>
                         <p style="margin: 0; font-size: 15px; color: #333;">{{ $subject->school->name ?? '—' }}</p>
                     </div>
 
                     <div class="mb-3">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Status</label>
+                        <label class="sb-form-label">Status</label>
                         <p style="margin: 0;">
                             @if($subject->status)
-                                <span style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Active</span>
+                                <span class="sb-badge sb-badge-active">Active</span>
                             @else
-                                <span style="background: #f8d7da; color: #842029; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inactive</span>
+                                <span class="sb-badge sb-badge-inactive">Inactive</span>
                             @endif
                         </p>
                     </div>
 
                     <div class="mb-3">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Description</label>
+                        <label class="sb-form-label">Description</label>
                         <p style="margin: 0; font-size: 15px; color: #333;">{{ $subject->description ?? 'No description provided.' }}</p>
                     </div>
 
@@ -76,7 +76,7 @@
                 <div class="card-body" style="padding: 24px;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 style="font-weight: 600; margin-bottom: 0; color: #1a1a2e;">Assigned Classes</h5>
-                        <span style="background: #e7f1ff; color: #0d6efd; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                        <span class="sb-badge sb-badge-info">
                             {{ $subject->schoolClasses->count() }} {{ Str::plural('class', $subject->schoolClasses->count()) }}
                         </span>
                     </div>
@@ -94,7 +94,7 @@
                                             <div style="font-size: 12px; color: #6c757d; margin-top: 2px;">{{ $class->school->name }}</div>
                                         @endif
                                     </div>
-                                    <span style="background: {{ $class->status ? '#d1e7dd' : '#f8d7da' }}; color: {{ $class->status ? '#0f5132' : '#842029' }}; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                                    <span class="sb-badge {{ $class->status ? 'sb-badge-active' : 'sb-badge-inactive' }}">
                                         {{ $class->status ? 'Active' : 'Inactive' }}
                                     </span>
                                 </div>
@@ -103,7 +103,7 @@
                     @else
                         <div style="text-align: center; padding: 32px 16px; color: #6c757d;">
                             <p style="margin: 0; font-size: 14px;">No classes assigned to this subject yet.</p>
-                            <a href="{{ route('subjects.edit', $subject) }}" style="color: #4f9cf7; font-weight: 500; text-decoration: none; font-size: 13px;">Assign classes</a>
+                            <a href="{{ route('subjects.edit', $subject) }}" class="sb-btn sb-btn-sm sb-btn-outline-primary mt-2">Assign classes</a>
                         </div>
                     @endif
                 </div>

@@ -47,7 +47,7 @@ class ReportService
     {
         $totalPaid = (float) $this->schoolScope(FeePayment::query())->sum('amount_paid');
 
-        $totalFees = (float) FeeStructure::when($this->schoolId !== null, fn ($q) => $q->where('school_id', $this->schoolId))
+        $totalFees = (float) FeeStructure::when($this->schoolId !== null, fn ($q) => $q->where('fee_structures.school_id', $this->schoolId))
             ->where('fee_structures.status', true)
             ->join('students', 'students.school_class_id', '=', 'fee_structures.school_class_id')
             ->when($this->schoolId !== null, fn ($q) => $q->where('students.school_id', $this->schoolId))

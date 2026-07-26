@@ -15,12 +15,10 @@
                 </p>
             </div>
             <div class="d-flex gap-2">
-                <a href="{{ route('classes.edit', $schoolClass) }}" class="btn"
-                    style="background: #e7f1ff; color: #0d6efd; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+                <a href="{{ route('classes.edit', $schoolClass) }}" class="sb-btn sb-btn-outline-primary">
                     Edit Class
                 </a>
-                <a href="{{ route('classes.index') }}" class="btn"
-                    style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
+                <a href="{{ route('classes.index') }}" class="sb-btn sb-btn-secondary">
                     Back to List
                 </a>
             </div>
@@ -30,9 +28,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card stat-card" style="height: 100%;">
                     <div class="card-body" style="padding: 24px;">
-                        <label
-                            style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Class
-                            Name</label>
+                        <label class="sb-form-label">Class Name</label>
                         <p style="margin: 0; font-size: 15px; font-weight: 500; color: #333;">{{ $schoolClass->name }}</p>
                     </div>
                 </div>
@@ -40,8 +36,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card stat-card" style="height: 100%;">
                     <div class="card-body" style="padding: 24px;">
-                        <label
-                            style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Section</label>
+                        <label class="sb-form-label">Section</label>
                         <p style="margin: 0; font-size: 15px; color: #333;">{{ $schoolClass->section ?? '—' }}</p>
                     </div>
                 </div>
@@ -49,15 +44,12 @@
             <div class="col-md-4 mb-3">
                 <div class="card stat-card" style="height: 100%;">
                     <div class="card-body" style="padding: 24px;">
-                        <label
-                            style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Status</label>
+                        <label class="sb-form-label">Status</label>
                         <p style="margin: 0;">
                             @if ($schoolClass->status)
-                                <span
-                                    style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Active</span>
+                                <span class="sb-badge sb-badge-active">Active</span>
                             @else
-                                <span
-                                    style="background: #f8d7da; color: #842029; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inactive</span>
+                                <span class="sb-badge sb-badge-inactive">Inactive</span>
                             @endif
                         </p>
                     </div>
@@ -68,8 +60,7 @@
         @if ($schoolClass->description)
             <div class="card stat-card mb-4">
                 <div class="card-body" style="padding: 24px;">
-                    <label
-                        style="display: block; font-size: 12px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Description</label>
+                    <label class="sb-form-label">Description</label>
                     <p style="margin: 0; font-size: 15px; color: #333;">{{ $schoolClass->description }}</p>
                 </div>
             </div>
@@ -81,44 +72,31 @@
                     <h5 style="font-weight: 600; margin: 0; color: #1a1a2e;">Students in this Class</h5>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0" style="margin-bottom: 0;">
+                    <table class="sb-table table table-hover mb-0">
                         <thead>
                             <tr style="background: #f8f9fa;">
-                                <th
-                                    style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    Adm. No.</th>
-                                <th
-                                    style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    Name</th>
-                                <th
-                                    style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    Gender</th>
-                                <th
-                                    style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    Email</th>
-                                <th
-                                    style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    Status</th>
+                                <th>Adm. No.</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Email</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($students as $student)
                                 <tr>
-                                    <td style="padding: 14px 20px;">
-                                        <code
-                                            style="background: #f0f2f5; padding: 2px 8px; border-radius: 4px; font-size: 13px;">{{ $student->admission_number }}</code>
+                                    <td>
+                                        <code>{{ $student->admission_number }}</code>
                                     </td>
-                                    <td style="padding: 14px 20px; font-weight: 500;">{{ $student->full_name }}</td>
-                                    <td style="padding: 14px 20px; color: #6c757d; text-transform: capitalize;">
+                                    <td style="font-weight: 500;">{{ $student->full_name }}</td>
+                                    <td style="text-transform: capitalize;">
                                         {{ $student->gender }}</td>
-                                    <td style="padding: 14px 20px; color: #6c757d;">{{ $student->email ?? '—' }}</td>
-                                    <td style="padding: 14px 20px;">
+                                    <td>{{ $student->email ?? '—' }}</td>
+                                    <td>
                                         @if ($student->status === 'active')
-                                            <span
-                                                style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Active</span>
+                                            <span class="sb-badge sb-badge-active">Active</span>
                                         @else
-                                            <span
-                                                style="background: #f8d7da; color: #842029; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Inactive</span>
+                                            <span class="sb-badge sb-badge-inactive">Inactive</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -126,9 +104,7 @@
                                 <tr>
                                     <td colspan="5" style="padding: 40px 20px; text-align: center; color: #6c757d;">
                                         <p style="margin: 0; font-size: 15px;">No students assigned to this class yet.</p>
-                                        <a href="{{ route('students.create') }}"
-                                            style="color: #4f9cf7; font-weight: 500; text-decoration: none;">Add a
-                                            student</a>
+                                        <a href="{{ route('students.create') }}" class="sb-btn sb-btn-sm sb-btn-outline-primary mt-2">Add a student</a>
                                     </td>
                                 </tr>
                             @endforelse

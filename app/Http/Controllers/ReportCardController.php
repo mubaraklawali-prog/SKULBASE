@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
+use App\Models\GradingSystem;
 use App\Models\SchoolClass;
 use App\Models\StudentReportCard;
 use App\Services\ResultComputationService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -29,7 +29,7 @@ class ReportCardController extends Controller
             $reportCard->student_id
         );
 
-        $gradingRules = \App\Models\GradingSystem::where('school_id', $reportCard->school_id)
+        $gradingRules = GradingSystem::where('school_id', $reportCard->school_id)
             ->orderByDesc('min_score')
             ->get();
 
@@ -48,20 +48,26 @@ class ReportCardController extends Controller
             $reportCard->student_id
         );
 
-        $gradingRules = \App\Models\GradingSystem::where('school_id', $reportCard->school_id)
+        $gradingRules = GradingSystem::where('school_id', $reportCard->school_id)
             ->orderByDesc('min_score')
             ->get();
 
-        $pdf = Pdf::loadView('results.report-cards.pdf', compact('reportCard', 'subjectScores', 'gradingRules'))
-            ->setPaper('a4')
-            ->setOption([
-                'isRemoteEnabled' => true,
-                'isHtml5ParserEnabled' => true,
-            ]);
+        try {
+            $pdf = Pdf::loadView('results.report-cards.pdf', compact('reportCard', 'subjectScores', 'gradingRules'))
+                ->setPaper('a4')
+                ->setOption([
+                    'isRemoteEnabled' => true,
+                    'isHtml5ParserEnabled' => true,
+                ]);
 
-        $fileName = 'report-card-' . $reportCard->student->admission_number . '-' . $reportCard->exam->name . '.pdf';
+            $fileName = 'report-card-'.$reportCard->student->admission_number.'-'.$reportCard->exam->name.'.pdf';
 
-        return $pdf->download($fileName);
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate report card PDF. Please try again.');
+        }
     }
 
     public function bulkSelector(): View
@@ -89,7 +95,7 @@ class ReportCardController extends Controller
             ->orderBy('class_position')
             ->get();
 
-        $gradingRules = \App\Models\GradingSystem::where('school_id', $schoolClass->school_id)
+        $gradingRules = GradingSystem::where('school_id', $schoolClass->school_id)
             ->orderByDesc('min_score')
             ->get();
 
@@ -123,7 +129,7 @@ class ReportCardController extends Controller
             ->orderBy('class_position')
             ->get();
 
-        $gradingRules = \App\Models\GradingSystem::where('school_id', $schoolClass->school_id)
+        $gradingRules = GradingSystem::where('school_id', $schoolClass->school_id)
             ->orderByDesc('min_score')
             ->get();
 
@@ -137,15 +143,21 @@ class ReportCardController extends Controller
             );
         }
 
-        $pdf = Pdf::loadView('results.report-cards.bulk-pdf', compact('reportCards', 'subjectScoresMap', 'exam', 'schoolClass', 'gradingRules'))
-            ->setPaper('a4')
-            ->setOption([
-                'isRemoteEnabled' => true,
-                'isHtml5ParserEnabled' => true,
-            ]);
+        try {
+            $pdf = Pdf::loadView('results.report-cards.bulk-pdf', compact('reportCards', 'subjectScoresMap', 'exam', 'schoolClass', 'gradingRules'))
+                ->setPaper('a4')
+                ->setOption([
+                    'isRemoteEnabled' => true,
+                    'isHtml5ParserEnabled' => true,
+                ]);
 
-        $fileName = 'report-cards-' . $schoolClass->name . '-' . $exam->name . '.pdf';
+            $fileName = 'report-cards-'.$schoolClass->name.'-'.$exam->name.'.pdf';
 
-        return $pdf->download($fileName);
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            report($e);
+
+            return back()->with('error', 'Failed to generate report cards PDF. Please try again.');
+        }
     }
 }

@@ -8,11 +8,8 @@
     <style>
         body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .form-card { max-width: 800px; margin: 40px auto; }
-        .form-header { background: #4f9cf7; color: #fff; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
+        .form-header { background: var(--primary); color: #fff; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
         .form-body { background: #fff; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-        .form-control, .form-select { border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px; }
-        .btn-primary { background: #4f9cf7; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 500; }
-        .btn-primary:hover { background: #3a8ae8; }
         .section-title { font-weight: 600; color: #1a1a2e; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; }
         .required { color: #dc3545; }
     </style>
@@ -26,14 +23,14 @@
             </div>
             <div class="form-body">
                 @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; background: #d1e7dd; border-color: #badbcc; color: #0f5132;">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
                 @if($errors->any())
-                    <div class="alert alert-danger" style="border-radius: 10px;">
+                    <div class="alert alert-danger">
                         <strong>Please correct the following errors:</strong>
                         <ul class="mb-0 mt-2">
                             @foreach($errors->all() as $error)
@@ -49,8 +46,8 @@
                     <h5 class="section-title">School Selection</h5>
                     <div class="row mb-4">
                         <div class="col-md-12">
-                            <label class="form-label">Select School <span class="required">*</span></label>
-                            <select name="school_id" class="form-select" required>
+                            <label class="sb-form-label">Select School <span class="required">*</span></label>
+                            <select name="school_id" class="sb-form-select" required>
                                 <option value="">Choose a school...</option>
                                 @foreach($schools as $school)
                                     <option value="{{ $school->id }}" {{ old('school_id') == $school->id ? 'selected' : '' }}>
@@ -65,12 +62,12 @@
                         <h5 class="section-title">Student Information</h5>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Full Name <span class="required">*</span></label>
-                                <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}" required placeholder="Enter student's full name">
+                                <label class="sb-form-label">Full Name <span class="required">*</span></label>
+                                <input type="text" name="full_name" class="sb-form-input" value="{{ old('full_name') }}" required placeholder="Enter student's full name">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Gender <span class="required">*</span></label>
-                                <select name="gender" class="form-select" required>
+                                <label class="sb-form-label">Gender <span class="required">*</span></label>
+                                <select name="gender" class="sb-form-select" required>
                                     <option value="">Select gender...</option>
                                     <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
@@ -79,24 +76,24 @@
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Date of Birth <span class="required">*</span></label>
-                                <input type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}" required>
+                                <label class="sb-form-label">Date of Birth <span class="required">*</span></label>
+                                <input type="date" name="date_of_birth" class="sb-form-input" value="{{ old('date_of_birth') }}" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Class Applying For <span class="required">*</span></label>
-                                <select name="class_id" class="form-select" id="classSelect" required>
+                                <label class="sb-form-label">Class Applying For <span class="required">*</span></label>
+                                <select name="class_id" class="sb-form-select" id="classSelect" required>
                                     <option value="">Select class...</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Previous School</label>
-                                <input type="text" name="previous_school" class="form-control" value="{{ old('previous_school') }}" placeholder="Enter previous school name">
+                                <label class="sb-form-label">Previous School</label>
+                                <input type="text" name="previous_school" class="sb-form-input" value="{{ old('previous_school') }}" placeholder="Enter previous school name">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Passport Photo</label>
-                                <input type="file" name="passport" class="form-control" accept="image/*">
+                                <label class="sb-form-label">Passport Photo</label>
+                                <input type="file" name="passport" class="sb-form-input" accept="image/*">
                                 <small class="text-muted">Max 2MB. JPG, PNG only.</small>
                             </div>
                         </div>
@@ -104,27 +101,27 @@
                         <h5 class="section-title">Parent/Guardian Information</h5>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Parent/Guardian Name <span class="required">*</span></label>
-                                <input type="text" name="parent_name" class="form-control" value="{{ old('parent_name') }}" required placeholder="Enter parent/guardian name">
+                                <label class="sb-form-label">Parent/Guardian Name <span class="required">*</span></label>
+                                <input type="text" name="parent_name" class="sb-form-input" value="{{ old('parent_name') }}" required placeholder="Enter parent/guardian name">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Phone Number <span class="required">*</span></label>
-                                <input type="text" name="parent_phone" class="form-control" value="{{ old('parent_phone') }}" required placeholder="Enter phone number">
+                                <label class="sb-form-label">Phone Number <span class="required">*</span></label>
+                                <input type="text" name="parent_phone" class="sb-form-input" value="{{ old('parent_phone') }}" required placeholder="Enter phone number">
                             </div>
                         </div>
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" name="parent_email" class="form-control" value="{{ old('parent_email') }}" placeholder="Enter email address">
+                                <label class="sb-form-label">Email Address</label>
+                                <input type="email" name="parent_email" class="sb-form-input" value="{{ old('parent_email') }}" placeholder="Enter email address">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Address <span class="required">*</span></label>
-                                <input type="text" name="address" class="form-control" value="{{ old('address') }}" required placeholder="Enter residential address">
+                                <label class="sb-form-label">Address <span class="required">*</span></label>
+                                <input type="text" name="address" class="sb-form-input" value="{{ old('address') }}" required placeholder="Enter residential address">
                             </div>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                            <button type="submit" class="sb-btn sb-btn-primary sb-btn-lg">Submit Application</button>
                         </div>
                     </div>
                 </form>

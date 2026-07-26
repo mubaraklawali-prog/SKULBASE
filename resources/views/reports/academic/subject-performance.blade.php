@@ -10,9 +10,9 @@
             <p class="text-muted mb-0">Subject-wise analysis</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('reports.export.subject-performance.csv', request()->query()) }}" class="btn" style="background: #198754; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Export CSV</a>
-            <a href="{{ route('reports.export.subject-performance.pdf', request()->query()) }}" class="btn" style="background: #dc3545; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Export PDF</a>
-            <a href="{{ route('reports.dashboard', array_filter(['school_id' => request('school_id')])) }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">Back</a>
+            <a href="{{ route('reports.export.subject-performance.csv', request()->query()) }}" class="sb-btn sb-btn-primary">Export CSV</a>
+            <a href="{{ route('reports.export.subject-performance.pdf', request()->query()) }}" class="sb-btn sb-btn-danger">Export PDF</a>
+            <a href="{{ route('reports.dashboard', array_filter(['school_id' => request('school_id')])) }}" class="sb-btn sb-btn-secondary">Back</a>
         </div>
     </div>
 
@@ -21,8 +21,8 @@
         <div class="card-body">
             <div class="d-flex gap-3 align-items-end">
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #6c757d; margin-bottom: 6px;">Exam</label>
-                    <select name="exam_id" style="width: 100%; padding: 10px 16px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 14px;">
+                    <label class="sb-form-label">Exam</label>
+                    <select name="exam_id" class="sb-form-select">
                         <option value="">-- Select Exam --</option>
                         @foreach($exams as $exam)
                             <option value="{{ $exam->id }}" {{ request('exam_id') == $exam->id ? 'selected' : '' }}>{{ $exam->name }}</option>
@@ -30,15 +30,15 @@
                     </select>
                 </div>
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #6c757d; margin-bottom: 6px;">Class (Optional)</label>
-                    <select name="class_id" style="width: 100%; padding: 10px 16px; border-radius: 8px; border: 1px solid #dee2e6; font-size: 14px;">
+                    <label class="sb-form-label">Class (Optional)</label>
+                    <select name="class_id" class="sb-form-select">
                         <option value="">All Classes</option>
                         @foreach($classes as $class)
                             <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="btn" style="background: #0a1628; color: #fff; border-radius: 8px; padding: 10px 24px; font-weight: 500; border: none; cursor: pointer;">Analyze</button>
+                <button type="submit" class="sb-btn sb-btn-dark">Analyze</button>
             </div>
         </div>
     </form>
@@ -47,27 +47,27 @@
         <div class="card stat-card">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="sb-table">
                         <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">#</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Subject</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Students</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Average</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Pass Rate</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Highest</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Lowest</th>
-                                <th style="padding: 14px 20px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Performance</th>
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th>Students</th>
+                                <th>Average</th>
+                                <th>Pass Rate</th>
+                                <th>Highest</th>
+                                <th>Lowest</th>
+                                <th>Performance</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($performance as $index => $item)
                                 <tr>
-                                    <td style="padding: 14px 20px; color: #6c757d;">{{ $index + 1 }}</td>
-                                    <td style="padding: 14px 20px; font-weight: 500;">{{ $item['subject']->name }}</td>
-                                    <td style="padding: 14px 20px;">{{ $item['students'] }}</td>
-                                    <td style="padding: 14px 20px; font-weight: 600;">{{ $item['average'] }}%</td>
-                                    <td style="padding: 14px 20px;">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td style="font-weight: 500;">{{ $item['subject']->name }}</td>
+                                    <td>{{ $item['students'] }}</td>
+                                    <td style="font-weight: 600;">{{ $item['average'] }}%</td>
+                                    <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div style="flex: 1; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden;">
                                                 <div style="height: 100%; width: {{ $item['pass_rate'] }}%; background: {{ $item['pass_rate'] >= 50 ? '#198754' : '#dc3545' }}; border-radius: 3px;"></div>
@@ -75,9 +75,9 @@
                                             <span style="font-size: 12px; font-weight: 600; min-width: 40px;">{{ $item['pass_rate'] }}%</span>
                                         </div>
                                     </td>
-                                    <td style="padding: 14px 20px; color: #0f5132;">{{ $item['highest'] }}%</td>
-                                    <td style="padding: 14px 20px; color: #842029;">{{ $item['lowest'] }}%</td>
-                                    <td style="padding: 14px 20px;">
+                                    <td style="color: #0f5132;">{{ $item['highest'] }}%</td>
+                                    <td style="color: #842029;">{{ $item['lowest'] }}%</td>
+                                    <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div style="flex: 1; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden;">
                                                 <div style="height: 100%; width: {{ $item['average'] }}%; background: {{ $item['average'] >= 50 ? '#198754' : '#dc3545' }}; border-radius: 3px;"></div>
@@ -93,8 +93,8 @@
         </div>
     @else
         <div class="card stat-card">
-            <div class="card-body" style="padding: 60px; text-align: center;">
-                <p class="text-muted" style="margin: 0; font-size: 15px;">No subject performance data available. Please select an exam.</p>
+            <div class="card-body sb-empty-state">
+                <p style="margin: 0; font-size: 15px;">No subject performance data available. Please select an exam.</p>
             </div>
         </div>
     @endif

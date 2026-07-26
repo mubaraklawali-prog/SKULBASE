@@ -42,7 +42,7 @@
         .print-header .timetable-title {
             font-size: 16px;
             font-weight: 600;
-            color: #4f9cf7;
+            color: var(--primary);
             margin-bottom: 4px;
         }
         .print-header .student-info {

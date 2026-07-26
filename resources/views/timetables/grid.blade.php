@@ -70,7 +70,7 @@
     }
     .lesson-card {
         background: #f0f7ff;
-        border-left: 3px solid #4f9cf7;
+        border-left: 3px solid var(--primary);
         border-radius: 6px;
         padding: 8px 10px;
     }
@@ -139,7 +139,7 @@
 </style>
 
 <div class="welcome-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="sb-section-header">
         <div>
             <h2>Weekly Timetable</h2>
             <p class="text-muted mb-0">Visual class schedule for the week</p>
@@ -148,8 +148,7 @@
             @if($selectedClassId && $selectedSectionId)
                 <a href="{{ route('timetables.print', ['class_id' => $selectedClassId, 'section_id' => $selectedSectionId]) }}"
                    target="_blank"
-                   class="btn"
-                   style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                   class="sb-btn sb-btn-outline-secondary d-inline-flex align-items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -158,8 +157,8 @@
                     Print
                 </a>
                 <button type="button"
-                        class="btn"
-                        style="background: #f0f2f5; color: #6c757d; border-radius: 8px; padding: 10px 20px; font-weight: 500; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;"
+                        class="sb-btn sb-btn-outline-secondary d-inline-flex align-items-center gap-2"
+                        style="cursor: not-allowed; opacity: 0.6;"
                         title="Coming soon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -172,12 +171,12 @@
         </div>
     </div>
 
-    <div class="card stat-card mb-4">
+    <div class="sb-card mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('timetables.grid') }}" class="row g-2 align-items-end">
-                <div class="col-md-3">
-                    <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Class <span style="color: #dc3545;">*</span></label>
-                    <select name="class_id" id="grid_class_id" class="form-control" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;" required>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label fw-medium text-muted small">Class <span class="text-danger">*</span></label>
+                    <select name="class_id" id="grid_class_id" class="sb-form-select" required>
                         <option value="">Select Class</option>
                         @foreach($classes as $class)
                             <option value="{{ $class->id }}" {{ old('class_id', $selectedClassId) == $class->id ? 'selected' : '' }}>
@@ -186,9 +185,9 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label style="display: block; font-weight: 500; font-size: 13px; color: #6c757d; margin-bottom: 4px;">Section <span style="color: #dc3545;">*</span></label>
-                    <select name="section_id" id="grid_section_id" class="form-control" style="border-radius: 8px; border: 1px solid #dee2e6; padding: 10px 16px;" required>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label fw-medium text-muted small">Section <span class="text-danger">*</span></label>
+                    <select name="section_id" id="grid_section_id" class="sb-form-select" required>
                         <option value="">Select Section</option>
                         @foreach($sections as $section)
                             <option value="{{ $section->id }}" {{ old('section_id', $selectedSectionId) == $section->id ? 'selected' : '' }}>
@@ -197,14 +196,10 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 24px; font-weight: 500; border: none; cursor: pointer;">
-                        Load Timetable
-                    </button>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <button type="submit" class="sb-btn sb-btn-primary">Load Timetable</button>
                     @if($selectedClassId && $selectedSectionId)
-                        <a href="{{ route('timetables.grid') }}" class="btn" style="background: #f0f2f5; color: #333; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none; margin-left: 6px;">
-                            Clear
-                        </a>
+                        <a href="{{ route('timetables.grid') }}" class="sb-btn sb-btn-outline-secondary ms-2">Clear</a>
                     @endif
                 </div>
             </form>
@@ -212,16 +207,16 @@
     </div>
 
     @if($selectedClassId && $selectedSectionId)
-        <div class="card stat-card mb-3">
+        <div class="sb-card mb-3">
             <div class="card-body py-3 px-4">
-                <div class="d-flex align-items-center gap-3">
-                    <span style="background: #0a1628; color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="badge" style="background: #0a1628; color: #fff; padding: 6px 14px; font-size: 13px; font-weight: 600;">
                         {{ $selectedClass->name ?? '' }}
                     </span>
-                    <span style="background: #e7f1ff; color: #0d6efd; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;">
+                    <span class="badge" style="background: #e7f1ff; color: #0d6efd; padding: 6px 14px; font-size: 13px; font-weight: 600;">
                         Section: {{ $selectedSection->name ?? '' }}
                     </span>
-                    <span style="color: #6c757d; font-size: 13px;">
+                    <span class="text-muted" style="font-size: 13px;">
                         {{ $grid->count() }} lesson{{ $grid->count() !== 1 ? 's' : '' }} scheduled
                     </span>
                 </div>
@@ -294,16 +289,16 @@
             </table>
         </div>
     @else
-        <div class="card stat-card">
-            <div class="card-body" style="padding: 60px 20px; text-align: center;">
+        <div class="sb-card">
+            <div class="card-body text-center py-5">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ced4da" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                <h5 style="color: #6c757d; font-weight: 600; margin-bottom: 8px;">Select Class & Section</h5>
-                <p style="color: #adb5bd; margin: 0;">Choose a class and section above, then click "Load Timetable" to view the weekly schedule.</p>
+                <h5 class="text-muted fw-semibold mb-2">Select Class & Section</h5>
+                <p class="text-muted mb-0">Choose a class and section above, then click "Load Timetable" to view the weekly schedule.</p>
             </div>
         </div>
     @endif

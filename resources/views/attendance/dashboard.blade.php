@@ -4,18 +4,14 @@
 
 @section('content')
 <div class="welcome-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="sb-section-header d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2>Attendance Dashboard</h2>
             <p class="text-muted mb-0">Overview for {{ now()->parse($today)->format('l, M d, Y') }}</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('attendance.create') }}" class="btn" style="background: #4f9cf7; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
-                Take Attendance
-            </a>
-            <a href="{{ route('attendance.class-report') }}" class="btn" style="background: #0a1628; color: #fff; border-radius: 8px; padding: 10px 20px; font-weight: 500; text-decoration: none;">
-                Class Report
-            </a>
+            <a href="{{ route('attendance.create') }}" class="sb-btn sb-btn-primary">Take Attendance</a>
+            <a href="{{ route('attendance.class-report') }}" class="sb-btn sb-btn-dark">Class Report</a>
         </div>
     </div>
 
@@ -80,17 +76,19 @@
                 <div class="card-body">
                     <h5 style="font-weight: 600; margin-bottom: 16px; color: #1a1a2e;">Class Attendance Today</h5>
                     @if($classesWithTodayAttendance->isEmpty())
-                        <p class="text-muted" style="margin: 0;">No classes found.</p>
+                        <div class="sb-empty-state">
+                            <p class="text-muted" style="margin: 0;">No classes found.</p>
+                        </div>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="sb-table table table-hover mb-0">
                                 <thead>
-                                    <tr style="background: #f8f9fa;">
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Class</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Students</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Marked</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Progress</th>
-                                        <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Action</th>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Students</th>
+                                        <th>Marked</th>
+                                        <th>Progress</th>
+                                        <th class="text-end">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,10 +99,10 @@
                                                 : 0;
                                         @endphp
                                         <tr>
-                                            <td style="padding: 12px 16px; font-weight: 500;">{{ $class->name }}{{ $class->section ? ' - ' . $class->section : '' }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $class->students_count }}</td>
-                                            <td style="padding: 12px 16px; color: #6c757d;">{{ $class->attendances_count }}</td>
-                                            <td style="padding: 12px 16px;">
+                                            <td style="font-weight: 500;">{{ $class->name }}{{ $class->section ? ' - ' . $class->section : '' }}</td>
+                                            <td>{{ $class->students_count }}</td>
+                                            <td>{{ $class->attendances_count }}</td>
+                                            <td>
                                                 <div class="d-flex align-items-center gap-2">
                                                     <div style="flex: 1; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden;">
                                                         <div style="height: 100%; width: {{ $progress }}%; background: {{ $progress == 100 ? '#198754' : ($progress > 0 ? '#ffc107' : '#e9ecef') }}; border-radius: 3px;"></div>
@@ -112,8 +110,8 @@
                                                     <span style="font-size: 12px; font-weight: 600; color: #6c757d; min-width: 35px;">{{ $progress }}%</span>
                                                 </div>
                                             </td>
-                                            <td style="padding: 12px 16px; text-align: right;">
-                                                <a href="{{ route('attendance.class-report.show', $class) }}" style="color: #4f9cf7; font-weight: 500; text-decoration: none; font-size: 13px;">View Report</a>
+                                            <td class="text-end">
+                                                <a href="{{ route('attendance.class-report.show', $class) }}" style="color: var(--primary); font-weight: 500; text-decoration: none; font-size: 13px;">View Report</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -157,34 +155,34 @@
             <div class="card-body">
                 <h5 style="font-weight: 600; margin-bottom: 16px; color: #1a1a2e;">Recent Activity Today</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="sb-table table table-hover mb-0">
                         <thead>
-                            <tr style="background: #f8f9fa;">
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Student</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Class</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
-                                <th style="padding: 12px 16px; font-size: 13px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px;">Marked By</th>
+                            <tr>
+                                <th>Student</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th>Marked By</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($recentAttendances as $record)
                                 <tr>
-                                    <td style="padding: 12px 16px; font-weight: 500;">
+                                    <td style="font-weight: 500;">
                                         <a href="{{ route('attendance.student', $record->student) }}" style="color: #333; text-decoration: none;">{{ $record->student->full_name }}</a>
                                     </td>
-                                    <td style="padding: 12px 16px; color: #6c757d;">{{ $record->schoolClass->name ?? '—' }}</td>
-                                    <td style="padding: 12px 16px;">
+                                    <td>{{ $record->schoolClass->name ?? '—' }}</td>
+                                    <td>
                                         @if($record->status === 'present')
-                                            <span style="background: #d1e7dd; color: #0f5132; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Present</span>
+                                            <span class="sb-badge sb-badge-present">Present</span>
                                         @elseif($record->status === 'absent')
-                                            <span style="background: #f8d7da; color: #842029; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Absent</span>
+                                            <span class="sb-badge sb-badge-absent">Absent</span>
                                         @elseif($record->status === 'late')
-                                            <span style="background: #fff3cd; color: #664d03; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Late</span>
+                                            <span class="sb-badge sb-badge-late">Late</span>
                                         @else
-                                            <span style="background: #e7f1ff; color: #0d6efd; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Excused</span>
+                                            <span class="sb-badge sb-badge-excused">Excused</span>
                                         @endif
                                     </td>
-                                    <td style="padding: 12px 16px; color: #6c757d;">{{ $record->marker->full_name ?? '—' }}</td>
+                                    <td>{{ $record->marker->full_name ?? '—' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -72,9 +72,7 @@ class AssignmentController extends Controller
 
     public function create(): View
     {
-        $schoolId = auth()->user()->role === 'teacher'
-            ? auth()->user()->school_id
-            : auth()->user()->school_id;
+        $schoolId = auth()->user()->school_id;
 
         $teachers = Teacher::where('school_id', $schoolId)
             ->where('status', true)

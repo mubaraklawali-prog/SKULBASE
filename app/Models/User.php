@@ -25,8 +25,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-        'school_id',
     ];
 
     /**
@@ -47,6 +45,11 @@ class User extends Authenticatable
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function teacher(): HasOne
+    {
+        return $this->hasOne(Teacher::class);
     }
 
     public function parent(): HasOne
@@ -84,6 +87,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'force_password_change' => 'boolean',
         ];
     }
 }

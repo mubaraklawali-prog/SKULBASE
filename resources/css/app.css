@@ -1,2 +1,4 @@
 @import "tailwindcss";
 @import "bootstrap/dist/css/bootstrap.min.css";
+@import "./design-system/main.css";
+@import "./dashboard.css";

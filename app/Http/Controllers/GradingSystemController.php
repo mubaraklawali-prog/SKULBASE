@@ -10,10 +10,20 @@ use Illuminate\View\View;
 
 class GradingSystemController extends Controller
 {
+    private function schoolId(): ?int
+    {
+        $user = auth()->user();
+
+        return $user->role === 'super_admin' ? null : $user->school_id;
+    }
+
     public function index(Request $request): View
     {
+        $schoolId = $this->schoolId();
+
         $gradingSystems = GradingSystem::query()
             ->with('school')
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($request->search, function ($query, $search) {
                 $query->where('grade', 'like', "%{$search}%")
                     ->orWhere('remark', 'like', "%{$search}%");
@@ -27,7 +37,8 @@ class GradingSystemController extends Controller
 
     public function create(): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.grading-systems.create', compact('schools'));
     }
@@ -69,7 +80,8 @@ class GradingSystemController extends Controller
 
     public function edit(GradingSystem $gradingSystem): View
     {
-        $schools = School::orderBy('name')->get();
+        $schoolId = $this->schoolId();
+        $schools = School::when($schoolId, fn ($q) => $q->where('id', $schoolId))->orderBy('name')->get();
 
         return view('results.grading-systems.edit', compact('gradingSystem', 'schools'));
     }

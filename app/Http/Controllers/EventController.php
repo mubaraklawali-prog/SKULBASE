@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
+use App\Models\School;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -53,13 +54,19 @@ class EventController extends Controller
 
     public function create(): View
     {
-        return view('events.create');
+        $user = auth()->user();
+        $schools = School::orderBy('name')->get();
+
+        return view('events.create', compact('schools'));
     }
 
     public function store(StoreEventRequest $request): RedirectResponse
     {
+        $user = auth()->user();
+        $schoolId = $user->role === 'super_admin' ? $request->school_id : $user->school_id;
+
         Event::create([
-            'school_id' => auth()->user()->school_id,
+            'school_id' => $schoolId,
             'user_id' => auth()->id(),
             'title' => $request->title,
             'description' => $request->description,

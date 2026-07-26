@@ -1,0 +1,265 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — ANIMATIONS
+   Subtle, professional transitions and keyframe animations.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------
+   TRANSITION UTILITIES
+   --------------------------------------------------------------- */
+.sb-transition-none     { transition: none; }
+.sb-transition-fast     { transition: all var(--duration-fast) var(--ease-default); }
+.sb-transition          { transition: all var(--duration-normal) var(--ease-default); }
+.sb-transition-slow     { transition: all var(--duration-slow) var(--ease-default); }
+.sb-transition-colors   { transition: var(--transition-colors); }
+.sb-transition-shadow   { transition: var(--transition-shadow); }
+.sb-transition-transform { transition: var(--transition-transform); }
+
+/* ---------------------------------------------------------------
+   BUTTON HOVER
+   --------------------------------------------------------------- */
+.sb-btn-transition {
+    transition: background-color var(--duration-fast) var(--ease-default),
+                color var(--duration-fast) var(--ease-default),
+                border-color var(--duration-fast) var(--ease-default),
+                box-shadow var(--duration-fast) var(--ease-default),
+                transform var(--duration-fast) var(--ease-default);
+}
+
+.sb-btn-transition:active {
+    transform: scale(0.98);
+}
+
+/* ---------------------------------------------------------------
+   CARD HOVER
+   --------------------------------------------------------------- */
+.sb-card-hover {
+    transition: box-shadow var(--duration-normal) var(--ease-default),
+                transform var(--duration-normal) var(--ease-default),
+                border-color var(--duration-fast) var(--ease-default);
+}
+
+.sb-card-hover:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+}
+
+/* ---------------------------------------------------------------
+   SIDEBAR HOVER
+   --------------------------------------------------------------- */
+.sb-sidebar-item {
+    transition: background-color var(--duration-fast) var(--ease-default),
+                color var(--duration-fast) var(--ease-default),
+                padding-left var(--duration-fast) var(--ease-default);
+}
+
+/* ---------------------------------------------------------------
+   DROPDOWN
+   --------------------------------------------------------------- */
+.sb-dropdown-enter {
+    animation: sb-dropdown-in var(--duration-normal) var(--ease-out) forwards;
+}
+
+.sb-dropdown-leave {
+    animation: sb-dropdown-out var(--duration-fast) var(--ease-in) forwards;
+}
+
+@keyframes sb-dropdown-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes sb-dropdown-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+}
+
+/* ---------------------------------------------------------------
+   MODAL
+   --------------------------------------------------------------- */
+.sb-modal-enter {
+    animation: sb-modal-in var(--duration-normal) var(--ease-out) forwards;
+}
+
+.sb-modal-backdrop-enter {
+    animation: sb-fade-in var(--duration-fast) var(--ease-out) forwards;
+}
+
+@keyframes sb-modal-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ---------------------------------------------------------------
+   COLLAPSE
+   --------------------------------------------------------------- */
+.sb-collapse-enter {
+    animation: sb-collapse-in var(--duration-normal) var(--ease-out) forwards;
+    overflow: hidden;
+}
+
+.sb-collapse-leave {
+    animation: sb-collapse-out var(--duration-fast) var(--ease-in) forwards;
+    overflow: hidden;
+}
+
+@keyframes sb-collapse-in {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 500px;
+        opacity: 1;
+    }
+}
+
+@keyframes sb-collapse-out {
+    from {
+        max-height: 500px;
+        opacity: 1;
+    }
+    to {
+        max-height: 0;
+        opacity: 0;
+    }
+}
+
+/* ---------------------------------------------------------------
+   FADE
+   --------------------------------------------------------------- */
+.sb-fade-in {
+    animation: sb-fade-in var(--duration-normal) var(--ease-out) forwards;
+}
+
+.sb-fade-out {
+    animation: sb-fade-out var(--duration-fast) var(--ease-in) forwards;
+}
+
+@keyframes sb-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes sb-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* ---------------------------------------------------------------
+   SLIDE IN (from direction)
+   --------------------------------------------------------------- */
+.sb-slide-in-right {
+    animation: sb-slide-in-right var(--duration-normal) var(--ease-out) forwards;
+}
+
+@keyframes sb-slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sb-slide-in-left {
+    animation: sb-slide-in-left var(--duration-normal) var(--ease-out) forwards;
+}
+
+@keyframes sb-slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sb-slide-in-up {
+    animation: sb-slide-in-up var(--duration-normal) var(--ease-out) forwards;
+}
+
+@keyframes sb-slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------------------------------------------------------------
+   SCALE (subtle pop)
+   --------------------------------------------------------------- */
+.sb-scale-in {
+    animation: sb-scale-in var(--duration-fast) var(--ease-bounce) forwards;
+}
+
+@keyframes sb-scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ---------------------------------------------------------------
+   SPINNER / LOADING
+   --------------------------------------------------------------- */
+.sb-spin {
+    animation: sb-spin 1s linear infinite;
+}
+
+@keyframes sb-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.sb-pulse {
+    animation: sb-pulse 2s var(--ease-in-out) infinite;
+}
+
+@keyframes sb-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+/* ---------------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

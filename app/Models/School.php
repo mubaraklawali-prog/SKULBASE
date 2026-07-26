@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class School extends Model
 {
     protected $fillable = [
         'name',
         'slug',
+        'school_type',
         'motto',
         'website',
         'email',
@@ -19,12 +22,56 @@ class School extends Model
         'city',
         'state',
         'country',
+        'principal_name',
         'is_active',
+        'registration_status',
+        'registered_at',
+        'approved_at',
+        'rejected_at',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'registered_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('registration_status', 'pending');
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $query->where('registration_status', 'approved');
+    }
+
+    public function scopeRejected(Builder $query): Builder
+    {
+        return $query->where('registration_status', 'rejected');
+    }
+
+    public function isPending(): bool
+    {
+        return $this->registration_status === 'pending';
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->registration_status === 'approved';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->registration_status === 'rejected';
+    }
+
+    public function hasRegistrationStatus(): bool
+    {
+        return $this->registration_status !== null;
+    }
 
     public function users(): HasMany
     {
@@ -129,5 +176,22 @@ class School extends Model
     public function admissions(): HasMany
     {
         return $this->hasMany(Admission::class);
+    }
+
+    public function setting(): HasOne
+    {
+        return $this->hasOne(SchoolSetting::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->whereIn('status', ['trial', 'active', 'grace'])
+            ->latest();
     }
 }

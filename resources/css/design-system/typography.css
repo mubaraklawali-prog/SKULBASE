@@ -1,0 +1,172 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — TYPOGRAPHY
+   Font family, scale, weights, and reusable type classes.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------
+   BASE FONT
+   --------------------------------------------------------------- */
+body,
+html {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------
+   HEADING SCALE
+   --------------------------------------------------------------- */
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+    color: var(--text-heading);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    margin-bottom: 0.5em;
+}
+
+h1, .h1 { font-size: var(--font-size-4xl); }
+h2, .h2 { font-size: var(--font-size-3xl); }
+h3, .h3 { font-size: var(--font-size-2xl); }
+h4, .h4 { font-size: var(--font-size-xl); }
+h5, .h5 { font-size: var(--font-size-lg); }
+h6, .h6 { font-size: var(--font-size-base); }
+
+/* ---------------------------------------------------------------
+   REUSABLE TYPOGRAPHY CLASSES
+   --------------------------------------------------------------- */
+
+/* Display — hero / landing */
+.sb-text-display {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--text-heading);
+}
+
+/* H1 */
+.sb-text-h1 {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--text-heading);
+}
+
+/* H2 */
+.sb-text-h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--text-heading);
+}
+
+/* H3 */
+.sb-text-h3 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--text-heading);
+}
+
+/* H4 */
+.sb-text-h4 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--text-heading);
+}
+
+/* Subtitle — secondary heading */
+.sb-text-subtitle {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    color: var(--text-muted);
+}
+
+/* Body */
+.sb-text-body {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-body);
+}
+
+/* Small */
+.sb-text-small {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-body);
+}
+
+/* Caption */
+.sb-text-caption {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
+    color: var(--text-muted);
+}
+
+/* Label */
+.sb-text-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    color: var(--text-heading);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Overline — section category label */
+.sb-text-overline {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ---------------------------------------------------------------
+   FONT WEIGHT UTILITIES
+   --------------------------------------------------------------- */
+.sb-font-light     { font-weight: var(--font-weight-light); }
+.sb-font-normal    { font-weight: var(--font-weight-normal); }
+.sb-font-medium    { font-weight: var(--font-weight-medium); }
+.sb-font-semibold  { font-weight: var(--font-weight-semibold); }
+.sb-font-bold      { font-weight: var(--font-weight-bold); }
+
+/* ---------------------------------------------------------------
+   TEXT ALIGN UTILITIES
+   --------------------------------------------------------------- */
+.sb-text-left    { text-align: left; }
+.sb-text-center  { text-align: center; }
+.sb-text-right   { text-align: right; }
+
+/* ---------------------------------------------------------------
+   LINE HEIGHT UTILITIES
+   --------------------------------------------------------------- */
+.sb-leading-tight    { line-height: var(--line-height-tight); }
+.sb-leading-snug     { line-height: var(--line-height-snug); }
+.sb-leading-normal   { line-height: var(--line-height-normal); }
+.sb-leading-relaxed  { line-height: var(--line-height-relaxed); }
+.sb-leading-loose    { line-height: var(--line-height-loose); }
+
+/* ---------------------------------------------------------------
+   LETTER SPACING UTILITIES
+   --------------------------------------------------------------- */
+.sb-tracking-tight   { letter-spacing: var(--letter-spacing-tight); }
+.sb-tracking-normal   { letter-spacing: var(--letter-spacing-normal); }
+.sb-tracking-wide    { letter-spacing: var(--letter-spacing-wide); }

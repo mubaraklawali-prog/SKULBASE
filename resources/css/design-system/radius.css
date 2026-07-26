@@ -1,0 +1,30 @@
+/* ==========================================================================
+   SKULBASE DESIGN SYSTEM — BORDER RADIUS
+   Consistent rounded corners across all components.
+   ========================================================================== */
+
+.sb-rounded-none  { border-radius: var(--radius-none); }
+.sb-rounded-sm    { border-radius: var(--radius-sm); }
+.sb-rounded       { border-radius: var(--radius-md); }
+.sb-rounded-md    { border-radius: var(--radius-md); }
+.sb-rounded-lg    { border-radius: var(--radius-lg); }
+.sb-rounded-xl    { border-radius: var(--radius-xl); }
+.sb-rounded-2xl   { border-radius: var(--radius-2xl); }
+.sb-rounded-full  { border-radius: var(--radius-full); }
+
+/* Per-corner rounding */
+.sb-rounded-t     { border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); }
+.sb-rounded-r     { border-top-right-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+.sb-rounded-b     { border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); }
+.sb-rounded-l     { border-top-left-radius: var(--radius-md); border-bottom-left-radius: var(--radius-md); }
+
+.sb-rounded-tl    { border-top-left-radius: var(--radius-md); }
+.sb-rounded-tr    { border-top-right-radius: var(--radius-md); }
+.sb-rounded-bl    { border-bottom-left-radius: var(--radius-md); }
+.sb-rounded-br    { border-bottom-right-radius: var(--radius-md); }
+
+/* Large per-corner */
+.sb-rounded-t-xl  { border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl); }
+.sb-rounded-b-xl  { border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl); }
+.sb-rounded-l-xl  { border-top-left-radius: var(--radius-xl); border-bottom-left-radius: var(--radius-xl); }
+.sb-rounded-r-xl  { border-top-right-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl); }

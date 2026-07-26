@@ -16,7 +16,7 @@
             padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
             cursor: pointer; text-decoration: none; border: none;
         }
-        .btn-print { background: #4f9cf7; color: #fff; }
+        .btn-print { background: var(--primary); color: #fff; }
         .btn-pdf { background: #0a1628; color: #fff; }
         .btn-back { background: #e9ecef; color: #333; }
 
@@ -35,7 +35,7 @@
             font-size: 11px; color: #6c757d; margin-top: 4px;
         }
         .school-header .report-title {
-            font-size: 16px; font-weight: 600; color: #4f9cf7; margin-top: 12px; text-transform: uppercase; letter-spacing: 2px;
+            font-size: 16px; font-weight: 600; color: var(--primary); margin-top: 12px; text-transform: uppercase; letter-spacing: 2px;
         }
         .school-logo {
             width: 80px; height: 80px; border-radius: 50%; object-fit: contain; margin-bottom: 8px;
@@ -57,7 +57,7 @@
         .section-title {
             font-size: 13px; font-weight: 700; color: #1a1a2e; text-transform: uppercase;
             letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px;
-            border-bottom: 2px solid #4f9cf7;
+            border-bottom: 2px solid var(--primary);
         }
 
         .score-table {
@@ -75,9 +75,14 @@
         .score-table .total-row {
             font-weight: 700; background: #f8f9fa;
         }
+        .score-table .text-bold { font-weight: 600; }
+        .score-table .text-muted-sm { font-size: 11px; }
 
         .summary-grid {
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;
+        }
+        .summary-grid-full {
+            grid-template-columns: 1fr;
         }
         .summary-box {
             padding: 12px; background: #f8f9fa; border-radius: 8px; text-align: center;
@@ -99,6 +104,7 @@
         .grade-table td {
             padding: 5px 10px; font-size: 11px; border-bottom: 1px solid #f0f0f0;
         }
+        .grade-table .text-bold { font-weight: 600; }
 
         .comments-section {
             display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
@@ -132,6 +138,14 @@
             padding-top: 12px; border-top: 1px solid #e9ecef;
         }
 
+        .badge-grade { background: #e7f1ff; color: #0d6efd; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-pass { background: #d1e7dd; color: #0f5132; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-fail { background: #f8d7da; color: #842029; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+
+        .text-primary { color: #0d6efd; }
+        .text-success { color: #0f5132; }
+        .text-danger { color: #842029; }
+
         @media print {
             body { background: #fff; }
             .print-actions { display: none !important; }
@@ -156,6 +170,9 @@
                 <img src="{{ asset('storage/' . $reportCard->school->logo) }}" alt="School Logo" class="school-logo">
             @endif
             <div class="school-name">{{ $reportCard->school->name ?? config('app.name', 'School') }}</div>
+            @if($reportCard->school->motto)
+                <div class="school-info" style="font-style: italic;">"{{ $reportCard->school->motto }}"</div>
+            @endif
             @if($reportCard->school->address)
                 <div class="school-info">{{ $reportCard->school->address }}{{ $reportCard->school->city ? ', ' . $reportCard->school->city : '' }}{{ $reportCard->school->state ? ', ' . $reportCard->school->state : '' }}</div>
             @endif
@@ -226,21 +243,21 @@
                         @endphp
                         <tr>
                             <td>{{ $sn++ }}</td>
-                            <td style="font-weight: 600;">{{ $data['subject']->name ?? '—' }}</td>
-                            <td style="font-weight: 600;">{{ number_format($score, 1) }}</td>
+                            <td class="text-bold">{{ $data['subject']->name ?? '—' }}</td>
+                            <td class="text-bold">{{ number_format($score, 1) }}</td>
                             <td>
                                 @if($grade)
-                                    <span style="background: #e7f1ff; color: #0d6efd; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">{{ $grade }}</span>
+                                    <span class="badge-grade">{{ $grade }}</span>
                                 @else
                                     —
                                 @endif
                             </td>
-                            <td style="font-size: 11px;">{{ $remark ?? '—' }}</td>
+                            <td class="text-muted-sm">{{ $remark ?? '—' }}</td>
                             <td>
                                 @if($score >= 50)
-                                    <span style="background: #d1e7dd; color: #0f5132; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Pass</span>
+                                    <span class="badge-pass">Pass</span>
                                 @else
-                                    <span style="background: #f8d7da; color: #842029; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Fail</span>
+                                    <span class="badge-fail">Fail</span>
                                 @endif
                             </td>
                         </tr>
@@ -251,7 +268,7 @@
 
         <div class="summary-grid">
             <div class="summary-box">
-                <div class="value" style="color: #0d6efd;">{{ number_format($reportCard->average_score, 1) }}%</div>
+                <div class="value text-primary">{{ number_format($reportCard->average_score, 1) }}%</div>
                 <div class="label">Average Score</div>
             </div>
             <div class="summary-box">
@@ -259,7 +276,7 @@
                 <div class="label">Overall Grade</div>
             </div>
             <div class="summary-box">
-                <div class="value" style="color: #0f5132;">{{ $reportCard->class_position ? $this->ordinal($reportCard->class_position) : '—' }}</div>
+                <div class="value text-success">@if($reportCard->class_position)@php $pos = $reportCard->class_position; $suffix = match(true) { $pos % 100 >= 11 && $pos % 100 <= 13 => 'th', $pos % 10 === 1 => 'st', $pos % 10 === 2 => 'nd', $pos % 10 === 3 => 'rd', default => 'th' }; @endphp{{ $pos . $suffix }}@else—@endif</div>
                 <div class="label">Class Position</div>
             </div>
             <div class="summary-box">
@@ -267,19 +284,19 @@
                 <div class="label">Total Score</div>
             </div>
             <div class="summary-box">
-                <div class="value" style="color: #0f5132;">{{ $reportCard->subjects_passed }}</div>
+                <div class="value text-success">{{ $reportCard->subjects_passed }}</div>
                 <div class="label">Subjects Passed</div>
             </div>
             <div class="summary-box">
-                <div class="value" style="color: #842029;">{{ $reportCard->subjects_failed }}</div>
+                <div class="value text-danger">{{ $reportCard->subjects_failed }}</div>
                 <div class="label">Subjects Failed</div>
             </div>
         </div>
 
         @if($reportCard->attendance_percentage !== null)
-            <div class="summary-grid" style="grid-template-columns: 1fr;">
+            <div class="summary-grid summary-grid-full">
                 <div class="summary-box">
-                    <div class="value" style="color: #0d6efd;">{{ number_format($reportCard->attendance_percentage, 1) }}%</div>
+                    <div class="value text-primary">{{ number_format($reportCard->attendance_percentage, 1) }}%</div>
                     <div class="label">Attendance</div>
                 </div>
             </div>
@@ -299,7 +316,7 @@
                     @foreach($gradingRules as $rule)
                         <tr>
                             <td>{{ number_format($rule->min_score, 0) }}% - {{ number_format($rule->max_score, 0) }}%</td>
-                            <td style="font-weight: 600;">{{ $rule->grade }}</td>
+                            <td class="text-bold">{{ $rule->grade }}</td>
                             <td>{{ $rule->remark }}</td>
                         </tr>
                     @endforeach

@@ -13,28 +13,38 @@
         .school-header { text-align: center; border-bottom: 3px double #1a1a2e; padding-bottom: 10px; margin-bottom: 14px; }
         .school-header .school-name { font-size: 18px; font-weight: 700; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; }
         .school-header .school-info { font-size: 9px; color: #6c757d; margin-top: 2px; }
-        .school-header .report-title { font-size: 13px; font-weight: 600; color: #4f9cf7; margin-top: 8px; text-transform: uppercase; letter-spacing: 2px; }
+        .school-header .report-title { font-size: 13px; font-weight: 600; color: var(--primary); margin-top: 8px; text-transform: uppercase; letter-spacing: 2px; }
+        .school-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 4px; }
 
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; background: #f8f9fa; }
         .info-table td { padding: 4px 8px; font-size: 10px; width: 50%; }
         .info-table td.label { font-weight: 600; color: #6c757d; font-size: 9px; text-transform: uppercase; width: 35%; }
         .info-table td.value { font-weight: 600; color: #1a1a2e; }
 
-        .section-title { font-size: 11px; font-weight: 700; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; padding-bottom: 3px; border-bottom: 2px solid #4f9cf7; }
+        .section-title { font-size: 11px; font-weight: 700; color: #1a1a2e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; padding-bottom: 3px; border-bottom: 2px solid var(--primary); }
 
         .score-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .score-table th { background: #f0f2f5; padding: 4px 6px; font-size: 8px; font-weight: 600; color: #6c757d; text-transform: uppercase; text-align: left; border-bottom: 2px solid #dee2e6; }
+        .score-table th.col-sn { width: 5%; }
+        .score-table th.col-subject { width: 30%; }
+        .score-table th.col-score { width: 15%; }
+        .score-table th.col-grade { width: 15%; }
+        .score-table th.col-remark { width: 20%; }
+        .score-table th.col-status { width: 15%; }
         .score-table td { padding: 4px 6px; font-size: 9px; border-bottom: 1px solid #f0f0f0; }
         .score-table tr:last-child td { border-bottom: 2px solid #dee2e6; }
+        .score-table .text-bold { font-weight: 600; }
 
         .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .summary-table td { padding: 5px; text-align: center; width: 33.33%; }
+        .summary-table td.col-full { width: 100%; }
         .summary-table .value { font-size: 14px; font-weight: 700; color: #1a1a2e; display: block; }
         .summary-table .label { font-size: 8px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: 1px; }
 
         .grade-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .grade-table th { background: #f0f2f5; padding: 3px 6px; font-size: 8px; font-weight: 600; color: #6c757d; text-transform: uppercase; text-align: left; border-bottom: 1px solid #dee2e6; }
         .grade-table td { padding: 3px 6px; font-size: 9px; border-bottom: 1px solid #f0f0f0; }
+        .grade-table .text-bold { font-weight: 600; }
 
         .comments-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         .comments-table td { padding: 6px; background: #f8f9fa; width: 50%; vertical-align: top; }
@@ -50,6 +60,12 @@
         .badge-pass { background: #d1e7dd; color: #0f5132; padding: 1px 6px; border-radius: 8px; font-size: 8px; font-weight: 600; }
         .badge-fail { background: #f8d7da; color: #842029; padding: 1px 6px; border-radius: 8px; font-size: 8px; font-weight: 600; }
         .badge-grade { background: #e7f1ff; color: #0d6efd; padding: 1px 6px; border-radius: 8px; font-size: 8px; font-weight: 600; }
+
+        .text-primary { color: #0d6efd; }
+        .text-success { color: #0f5132; }
+        .text-danger { color: #842029; }
+
+        .empty-state { text-align: center; padding: 60px 32px; color: #6c757d; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -60,9 +76,12 @@
         <div class="report-card">
             <div class="school-header">
                 @if($reportCard->school->logo)
-                    <img src="{{ public_path('storage/' . $reportCard->school->logo) }}" alt="Logo" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 4px;">
+                    <img src="{{ public_path('storage/' . $reportCard->school->logo) }}" alt="Logo" class="school-logo">
                 @endif
                 <div class="school-name">{{ $reportCard->school->name ?? config('app.name', 'School') }}</div>
+                @if($reportCard->school->motto)
+                    <div class="school-info" style="font-style: italic;">"{{ $reportCard->school->motto }}"</div>
+                @endif
                 @if($reportCard->school->address)
                     <div class="school-info">{{ $reportCard->school->address }}{{ $reportCard->school->city ? ', ' . $reportCard->school->city : '' }}{{ $reportCard->school->state ? ', ' . $reportCard->school->state : '' }}</div>
                 @endif
@@ -102,12 +121,12 @@
                 <table class="score-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">S/N</th>
-                            <th style="width: 30%;">Subject</th>
-                            <th style="width: 15%;">Score (%)</th>
-                            <th style="width: 15%;">Grade</th>
-                            <th style="width: 20%;">Remark</th>
-                            <th style="width: 15%;">Status</th>
+                            <th class="col-sn">S/N</th>
+                            <th class="col-subject">Subject</th>
+                            <th class="col-score">Score (%)</th>
+                            <th class="col-grade">Grade</th>
+                            <th class="col-remark">Remark</th>
+                            <th class="col-status">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,8 +146,8 @@
                             @endphp
                             <tr>
                                 <td>{{ $sn++ }}</td>
-                                <td style="font-weight: 600;">{{ $data['subject']->name ?? '—' }}</td>
-                                <td style="font-weight: 600;">{{ number_format($score, 1) }}</td>
+                                <td class="text-bold">{{ $data['subject']->name ?? '—' }}</td>
+                                <td class="text-bold">{{ number_format($score, 1) }}</td>
                                 <td>
                                     @if($grade)
                                         <span class="badge-grade">{{ $grade }}</span>
@@ -153,7 +172,7 @@
             <table class="summary-table">
                 <tr>
                     <td>
-                        <span class="value" style="color: #0d6efd;">{{ number_format($reportCard->average_score, 1) }}%</span>
+                        <span class="value text-primary">{{ number_format($reportCard->average_score, 1) }}%</span>
                         <span class="label">Average Score</span>
                     </td>
                     <td>
@@ -161,7 +180,7 @@
                         <span class="label">Overall Grade</span>
                     </td>
                     <td>
-                        <span class="value" style="color: #0f5132;">{{ $reportCard->class_position ? $this->ordinal($reportCard->class_position) : '—' }}</span>
+                        <span class="value text-success">@if($reportCard->class_position)@php $pos = $reportCard->class_position; $suffix = match(true) { $pos % 100 >= 11 && $pos % 100 <= 13 => 'th', $pos % 10 === 1 => 'st', $pos % 10 === 2 => 'nd', $pos % 10 === 3 => 'rd', default => 'th' }; @endphp{{ $pos . $suffix }}@else—@endif</span>
                         <span class="label">Class Position</span>
                     </td>
                 </tr>
@@ -171,11 +190,11 @@
                         <span class="label">Total Score</span>
                     </td>
                     <td>
-                        <span class="value" style="color: #0f5132;">{{ $reportCard->subjects_passed }}</span>
+                        <span class="value text-success">{{ $reportCard->subjects_passed }}</span>
                         <span class="label">Subjects Passed</span>
                     </td>
                     <td>
-                        <span class="value" style="color: #842029;">{{ $reportCard->subjects_failed }}</span>
+                        <span class="value text-danger">{{ $reportCard->subjects_failed }}</span>
                         <span class="label">Subjects Failed</span>
                     </td>
                 </tr>
@@ -184,8 +203,8 @@
             @if($reportCard->attendance_percentage !== null)
                 <table class="summary-table" style="margin-bottom: 12px;">
                     <tr>
-                        <td style="width: 100%;">
-                            <span class="value" style="color: #0d6efd;">{{ number_format($reportCard->attendance_percentage, 1) }}%</span>
+                        <td class="col-full">
+                            <span class="value text-primary">{{ number_format($reportCard->attendance_percentage, 1) }}%</span>
                             <span class="label">Attendance</span>
                         </td>
                     </tr>
@@ -206,7 +225,7 @@
                         @foreach($gradingRules as $rule)
                             <tr>
                                 <td>{{ number_format($rule->min_score, 0) }}% - {{ number_format($rule->max_score, 0) }}%</td>
-                                <td style="font-weight: 600;">{{ $rule->grade }}</td>
+                                <td class="text-bold">{{ $rule->grade }}</td>
                                 <td>{{ $rule->remark }}</td>
                             </tr>
                         @endforeach
@@ -244,7 +263,7 @@
             </div>
         </div>
     @empty
-        <div style="text-align: center; padding: 60px 32px; color: #6c757d; font-size: 14px;">
+        <div class="empty-state">
             No published report cards found for this exam and class.
         </div>
     @endforelse
