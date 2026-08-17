@@ -148,4 +148,134 @@
         </x-dashboard.widget-card>
     </div>
 </div>
+
+{{-- Charts Section --}}
+<div class="row g-4 mb-4">
+    <div class="col-xl-4 col-lg-4">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Attendance Trend</h3>
+                    <p class="ds-chart-card-subtitle">Monthly rate (last 6 months)</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 240px;">
+                <canvas id="studentChartAttendance"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-4">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Fee Status</h3>
+                    <p class="ds-chart-card-subtitle">Paid vs Outstanding</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 240px;">
+                <canvas id="studentChartFees"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-4">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Assignment Status</h3>
+                    <p class="ds-chart-card-subtitle">Upcoming / Overdue / Completed</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 240px;">
+                <canvas id="studentChartAssignments"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Score Performance Chart --}}
+@if(!empty($chartData['score_subject_labels']) && count($chartData['score_subject_labels']) > 0)
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Subject Performance</h3>
+                    <p class="ds-chart-card-subtitle">Average scores by subject</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="studentChartScores"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@push('scripts')
+<script>
+    (function() {
+        function init() {
+            var attLabels = @json($chartData['attendance_trend_labels'] ?? []);
+            var attData = @json($chartData['attendance_trend_data'] ?? []);
+            if (attLabels.length) {
+                window.SkulCharts.createAreaChart('studentChartAttendance', {
+                    labels: attLabels,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attData,
+                        color: '#8B5CF6',
+                        backgroundColor: '#8B5CF618',
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+
+            var totalPaid = @json((float) $totalPaid);
+            var outstanding = @json((float) $outstanding);
+            if (totalPaid > 0 || outstanding > 0) {
+                window.SkulCharts.createDoughnutChart('studentChartFees', {
+                    labels: ['Paid', 'Outstanding'],
+                    data: [totalPaid, outstanding],
+                    colors: ['#10B981', '#F59E0B'],
+                });
+            }
+
+            var assignLabels = @json($chartData['assignment_labels'] ?? []);
+            var assignData = @json($chartData['assignment_data'] ?? []);
+            if (assignLabels.length && assignData.some(function(v) { return v > 0; })) {
+                window.SkulCharts.createDoughnutChart('studentChartAssignments', {
+                    labels: assignLabels,
+                    data: assignData,
+                    colors: ['#3B82F6', '#EF4444', '#10B981'],
+                });
+            }
+
+            var scoreLabels = @json($chartData['score_subject_labels'] ?? []);
+            var scoreData = @json($chartData['score_subject_data'] ?? []);
+            if (scoreLabels.length) {
+                window.SkulCharts.createBarChart('studentChartScores', {
+                    labels: scoreLabels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: scoreData,
+                        backgroundColor: '#10B981',
+                        borderRadius: 6,
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+        }
+        if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+        init();
+    })();
+</script>
+@endpush
 @endsection

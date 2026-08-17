@@ -57,6 +57,11 @@ class User extends Authenticatable
         return $this->hasOne(ParentModel::class);
     }
 
+    public function affiliate(): HasOne
+    {
+        return $this->hasOne(Affiliate::class);
+    }
+
     public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);

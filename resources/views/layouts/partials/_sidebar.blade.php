@@ -47,7 +47,7 @@
 
             {{-- ═══════════ DASHBOARD (all roles) ═══════════ --}}
             <li class="sb-sidebar-item">
-                <a class="sb-sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                <a class="sb-sidebar-link {{ request()->routeIs('dashboard') || request()->routeIs('affiliate.dashboard') ? 'active' : '' }}" href="{{ $userRole === 'affiliate' ? route('affiliate.dashboard') : route('dashboard') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
                     <span>Dashboard</span>
                 </a>
@@ -345,6 +345,23 @@
                 </li>
             @endif
 
+            {{-- ═══════════ SUPER ADMIN: REFERRAL PROGRAM ═══════════ --}}
+            @if ($isSuperAdmin)
+                <li class="sb-sidebar-section">Referral Program</li>
+                <li class="sb-sidebar-item">
+                    <a class="sb-sidebar-link {{ request()->routeIs('affiliates.*') ? 'active' : '' }}" href="{{ route('affiliates.index') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span>Affiliates</span>
+                    </a>
+                </li>
+                <li class="sb-sidebar-item">
+                    <a class="sb-sidebar-link {{ request()->routeIs('payouts.*') ? 'active' : '' }}" href="{{ route('payouts.index') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <span>Payouts</span>
+                    </a>
+                </li>
+            @endif
+
             {{-- ═══════════ SCHOOL ADMIN: SUBSCRIPTION ═══════════ --}}
             @if ($isSchoolAdmin)
                 <li class="sb-sidebar-item">
@@ -374,6 +391,23 @@
                     <a class="sb-sidebar-link {{ request()->routeIs('events.*') ? 'active' : '' }}" href="{{ route('events.index') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <span>Calendar</span>
+                    </a>
+                </li>
+            @endif
+
+            {{-- ═══════════ AFFILIATE PORTAL ═══════════ --}}
+            @if ($userRole === 'affiliate')
+                <li class="sb-sidebar-section">Affiliate</li>
+                <li class="sb-sidebar-item">
+                    <a class="sb-sidebar-link {{ request()->routeIs('affiliate.dashboard') ? 'active' : '' }}" href="{{ route('affiliate.dashboard') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span>My Dashboard</span>
+                    </a>
+                </li>
+                <li class="sb-sidebar-item">
+                    <a class="sb-sidebar-link {{ request()->routeIs('password.change') ? 'active' : '' }}" href="{{ route('password.change') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Change Password</span>
                     </a>
                 </li>
             @endif

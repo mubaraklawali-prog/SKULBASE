@@ -5,17 +5,30 @@ namespace App\Http\Controllers;
 use App\Models\Plan;
 use App\Models\School;
 use App\Models\User;
+use App\Services\AffiliateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class PublicRegistrationController extends Controller
 {
+    public function __construct(
+        private AffiliateService $affiliateService
+    ) {}
+
     public function showForm(): View
     {
+        $ref = request('ref');
+
+        if ($ref) {
+            session()->put('affiliate_ref', $ref);
+            $this->affiliateService->findByCode($ref)?->increment('clicks');
+        }
+
         $plans = Plan::active()->ordered()->get();
 
         return view('auth.register-school', compact('plans'));
@@ -32,11 +45,11 @@ class PublicRegistrationController extends Controller
             'admin_name' => 'required|string|max:255',
             'admin_email' => 'required|email|max:255|unique:users,email',
             'admin_phone' => 'nullable|string|max:20',
+            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers(), 'regex:/^\S+$/'],
             'plan_id' => 'required|exists:plans,id',
             'terms' => 'accepted',
         ]);
 
-        $temporaryPassword = Str::random(12);
         $slug = Str::slug($validated['school_name']);
 
         $existingSlugCount = School::where('slug', $slug)->count();
@@ -44,7 +57,7 @@ class PublicRegistrationController extends Controller
             $slug = $slug.'-'.$existingSlugCount;
         }
 
-        DB::transaction(function () use ($validated, $temporaryPassword, $slug) {
+        DB::transaction(function () use ($request, $validated, $slug) {
             $school = School::create([
                 'name' => $validated['school_name'],
                 'slug' => $slug,
@@ -56,12 +69,13 @@ class PublicRegistrationController extends Controller
                 'is_active' => false,
                 'registration_status' => 'pending',
                 'registered_at' => now(),
+                'selected_plan_id' => $validated['plan_id'],
             ]);
 
             $user = User::create([
                 'name' => $validated['admin_name'],
                 'email' => $validated['admin_email'],
-                'password' => Hash::make($temporaryPassword),
+                'password' => Hash::make($validated['password']),
             ]);
 
             $user->forceFill([
@@ -72,7 +86,15 @@ class PublicRegistrationController extends Controller
             $school->update([
                 'registered_at' => now(),
             ]);
+
+            $this->affiliateService->handleSchoolRegistration(
+                $school,
+                $request->input('ref', session('affiliate_ref')),
+                'link'
+            );
         });
+
+        session()->forget('affiliate_ref');
 
         return redirect()
             ->route('login')

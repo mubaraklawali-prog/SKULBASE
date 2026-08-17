@@ -144,14 +144,14 @@
     <div class="mb-4">
         <?php if (isset($component)) { $__componentOriginal46d7df772faf884d6cbb5c75b0b04b6e = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal46d7df772faf884d6cbb5c75b0b04b6e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dashboard.widget-card','data' => ['title' => 'Today\'s Schedule','subtitle' => ''.e(Carbon::now()->format('l, F j, Y')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dashboard.widget-card','data' => ['title' => 'Today\'s Schedule','subtitle' => ''.e(\Carbon\Carbon::now()->format('l, F j, Y')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('dashboard.widget-card'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['title' => 'Today\'s Schedule','subtitle' => ''.e(Carbon::now()->format('l, F j, Y')).'']); ?>
+<?php $component->withAttributes(['title' => 'Today\'s Schedule','subtitle' => ''.e(\Carbon\Carbon::now()->format('l, F j, Y')).'']); ?>
             <div class="ds-timetable-list">
                 <?php $__currentLoopData = $todayTimetable; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $slot): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="ds-timetable-slot">
@@ -499,24 +499,89 @@
 <?php endif; ?>
 </div>
 
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-6 col-lg-6">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Weekly Attendance</h3>
+                    <p class="ds-chart-card-subtitle">Attendance records this week</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartWeeklyAttendance"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Students by Class</h3>
+                    <p class="ds-chart-card-subtitle">Student distribution</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartTeacherClasses"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Assignment Status</h3>
+                    <p class="ds-chart-card-subtitle">Upcoming / Overdue / Completed</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartTeacherAssignments"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php $__env->startPush('scripts'); ?>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (!window.SkulCharts) return;
+    (function() {
+        function init() {
+            var weekLabels = <?php echo json_encode($chartData['weekly_labels'] ?? [], 15, 512) ?>;
+            var weekPresent = <?php echo json_encode($chartData['weekly_present'] ?? [], 15, 512) ?>;
+            var weekTotal = <?php echo json_encode($chartData['weekly_total'] ?? [], 15, 512) ?>;
+            if (weekLabels.length) {
+                window.SkulCharts.createBarChart('chartWeeklyAttendance', {
+                    labels: weekLabels,
+                    datasets: [
+                        { label: 'Total', data: weekTotal, backgroundColor: '#E2E8F0', borderRadius: 6 },
+                        { label: 'Present', data: weekPresent, backgroundColor: '#8B5CF6', borderRadius: 6 },
+                    ],
+                });
+            }
 
-        const weekLabels = <?php echo json_encode($chartData['weekly_labels'], 15, 512) ?>;
-        const weekPresent = <?php echo json_encode($chartData['weekly_present'], 15, 512) ?>;
-        const weekTotal = <?php echo json_encode($chartData['weekly_total'], 15, 512) ?>;
-        if (weekLabels.length) {
-            window.SkulCharts.createBarChart('chartWeeklyAttendance', {
-                labels: weekLabels,
-                datasets: [
-                    { label: 'Total', data: weekTotal, backgroundColor: '#E2E8F0', borderRadius: 6 },
-                    { label: 'Present', data: weekPresent, backgroundColor: '#10B981', borderRadius: 6 },
-                ],
-            });
+            var classLabels = <?php echo json_encode($chartData['class_labels'] ?? [], 15, 512) ?>;
+            var classData = <?php echo json_encode($chartData['class_data'] ?? [], 15, 512) ?>;
+            if (classLabels.length) {
+                window.SkulCharts.createDoughnutChart('chartTeacherClasses', {
+                    labels: classLabels,
+                    data: classData,
+                    colors: ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#06B6D4'],
+                });
+            }
+
+            var assignLabels = <?php echo json_encode($chartData['assignment_labels'] ?? [], 15, 512) ?>;
+            var assignData = <?php echo json_encode($chartData['assignment_data'] ?? [], 15, 512) ?>;
+            if (assignLabels.length && assignData.some(function(v) { return v > 0; })) {
+                window.SkulCharts.createDoughnutChart('chartTeacherAssignments', {
+                    labels: assignLabels,
+                    data: assignData,
+                    colors: ['#3B82F6', '#EF4444', '#10B981'],
+                });
+            }
         }
-    });
+        if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+        init();
+    })();
 </script>
 <?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>

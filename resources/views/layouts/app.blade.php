@@ -1153,6 +1153,7 @@
         })();
     </script>
 
+    <script>window.__skulChartsQueue = window.__skulChartsQueue || [];</script>
     @stack('scripts')
 </body>
 

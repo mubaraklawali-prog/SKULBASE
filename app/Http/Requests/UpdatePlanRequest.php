@@ -28,6 +28,10 @@ class UpdatePlanRequest extends FormRequest
             'trial_days' => ['required', 'integer', 'min:0', 'max:365'],
             'is_active' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'discount_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'discount_start_date' => ['nullable', 'date', 'before_or_equal:discount_end_date'],
+            'discount_end_date' => ['nullable', 'date', 'after_or_equal:discount_start_date'],
+            'discount_scope' => ['nullable', 'in:monthly,annual,both'],
         ];
     }
 

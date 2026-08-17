@@ -108,10 +108,10 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-3" style="border-top: 1px solid #e9ecef; padding-top: 16px;">
-                            <a href="{{ route('plans.index') }}" class="sb-btn sb-btn-primary">
+                            <a href="{{ route('school.subscription.checkout', ['plan_id' => $subscription->plan_id, 'billing_cycle' => $subscription->billing_cycle]) }}" class="sb-btn sb-btn-primary">
                                 Renew Subscription
                             </a>
-                            <a href="{{ route('plans.index') }}" class="sb-btn sb-btn-outline-primary">
+                            <a href="{{ route('school.subscription.checkout', ['plan_id' => $subscription->plan_id, 'billing_cycle' => $subscription->billing_cycle]) }}" class="sb-btn sb-btn-outline-primary">
                                 Upgrade Plan
                             </a>
                         </div>

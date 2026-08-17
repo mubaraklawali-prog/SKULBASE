@@ -440,7 +440,110 @@
 <?php endif; ?>
     </div>
 
+    
+    <?php if(!empty($chartData) && count($chartData['attendance_trend_labels'] ?? []) > 0): ?>
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Attendance Trend</h3>
+                        <p class="ds-chart-card-subtitle">Monthly rate (last 6 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartAttendance"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Fee Breakdown</h3>
+                        <p class="ds-chart-card-subtitle">Paid vs Outstanding</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartFees"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Children Performance</h3>
+                        <p class="ds-chart-card-subtitle">Average scores by child</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartResults"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
 <?php endif; ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+    (function() {
+        function init() {
+            var attLabels = <?php echo json_encode($chartData['attendance_trend_labels'] ?? [], 15, 512) ?>;
+            var attData = <?php echo json_encode($chartData['attendance_trend_data'] ?? [], 15, 512) ?>;
+            if (attLabels.length) {
+                window.SkulCharts.createAreaChart('parentChartAttendance', {
+                    labels: attLabels,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attData,
+                        color: '#8B5CF6',
+                        backgroundColor: '#8B5CF618',
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+
+            var feeLabels = <?php echo json_encode($chartData['fee_labels'] ?? [], 15, 512) ?>;
+            var feeData = <?php echo json_encode($chartData['fee_data'] ?? [], 15, 512) ?>;
+            if (feeLabels.length && feeData.some(function(v) { return v > 0; })) {
+                window.SkulCharts.createDoughnutChart('parentChartFees', {
+                    labels: feeLabels,
+                    data: feeData,
+                    colors: ['#10B981', '#F59E0B'],
+                });
+            }
+
+            var childLabels = <?php echo json_encode($chartData['results_child_labels'] ?? [], 15, 512) ?>;
+            var childData = <?php echo json_encode($chartData['results_child_data'] ?? [], 15, 512) ?>;
+            if (childLabels.length) {
+                window.SkulCharts.createBarChart('parentChartResults', {
+                    labels: childLabels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: childData,
+                        backgroundColor: '#10B981',
+                        borderRadius: 6,
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+        }
+        if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+        init();
+    })();
+</script>
+<?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\USER\OneDrive\Desktop\SKILL\APP School\School Project\schoolproject\school-system\resources\views/parent/dashboard.blade.php ENDPATH**/ ?>

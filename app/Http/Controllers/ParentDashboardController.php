@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Traits\ResolvesParentChildren;
 use App\Models\Announcement;
+use App\Models\Attendance;
 use App\Models\Event;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
 use App\Models\Message;
 use App\Models\StudentResult;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -101,6 +103,59 @@ class ParentDashboardController extends Controller
             'unread_messages' => $unreadMessages,
         ];
 
+        $chartData = [];
+        if ($studentIds->isNotEmpty()) {
+            $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+
+            $attendanceTrend = Attendance::whereIn('student_id', $studentIds)
+                ->where('school_id', $school->id)
+                ->where('attendance_date', '>=', $sixMonthsAgo)
+                ->orderBy('attendance_date')
+                ->get()
+                ->groupBy(fn ($a) => $a->attendance_date->format('M Y'))
+                ->map(function ($group) {
+                    $total = $group->count();
+                    $present = $group->whereIn('status', ['present', 'late', 'excused'])->count();
+
+                    return $total > 0 ? round(($present / $total) * 100, 1) : 0;
+                })
+                ->toArray();
+
+            $totalFeesAmount = FeeStructure::where('school_id', $school->id)
+                ->where('status', true)
+                ->whereIn('school_class_id', $children->pluck('school_class_id')->filter()->values())
+                ->sum('amount');
+
+            $totalPaidByChildren = FeePayment::whereIn('student_id', $studentIds)
+                ->where('school_id', $school->id)
+                ->sum('amount_paid');
+
+            $feeOutstanding = max(0, (float) $totalFeesAmount - (float) $totalPaidByChildren);
+
+            $resultsByChild = StudentResult::whereIn('student_id', $studentIds)
+                ->where('school_id', $school->id)
+                ->with('student')
+                ->latest('id')
+                ->get()
+                ->groupBy('student_id')
+                ->map(function ($group) {
+                    return [
+                        'name' => $group->first()->student->full_name ?? 'Unknown',
+                        'average' => round($group->avg('score'), 1),
+                    ];
+                })
+                ->values();
+
+            $chartData = [
+                'attendance_trend_labels' => array_keys($attendanceTrend),
+                'attendance_trend_data' => array_values($attendanceTrend),
+                'fee_labels' => ['Paid', 'Outstanding'],
+                'fee_data' => [(float) $totalPaidByChildren, $feeOutstanding],
+                'results_child_labels' => $resultsByChild->pluck('name')->toArray(),
+                'results_child_data' => $resultsByChild->pluck('average')->toArray(),
+            ];
+        }
+
         return view('parent.dashboard', compact(
             'parent',
             'school',
@@ -110,6 +165,7 @@ class ParentDashboardController extends Controller
             'activeAnnouncements',
             'upcomingEvents',
             'parentStats',
+            'chartData',
         ));
     }
 }

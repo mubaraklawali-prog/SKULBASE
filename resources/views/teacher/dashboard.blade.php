@@ -73,7 +73,7 @@
 {{-- Today's Timetable --}}
 @if($todayTimetable->isNotEmpty())
     <div class="mb-4">
-        <x-dashboard.widget-card title="Today's Schedule" subtitle="{{ Carbon::now()->format('l, F j, Y') }}">
+        <x-dashboard.widget-card title="Today's Schedule" subtitle="{{ \Carbon\Carbon::now()->format('l, F j, Y') }}">
             <div class="ds-timetable-list">
                 @foreach($todayTimetable as $slot)
                     <div class="ds-timetable-slot">
@@ -228,24 +228,89 @@
     </x-dashboard.widget-card>
 </div>
 
+{{-- Charts Section --}}
+<div class="row g-4 mb-4">
+    <div class="col-xl-6 col-lg-6">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Weekly Attendance</h3>
+                    <p class="ds-chart-card-subtitle">Attendance records this week</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartWeeklyAttendance"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Students by Class</h3>
+                    <p class="ds-chart-card-subtitle">Student distribution</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartTeacherClasses"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3">
+        <div class="ds-chart-card">
+            <div class="ds-chart-card-header">
+                <div>
+                    <h3 class="ds-chart-card-title">Assignment Status</h3>
+                    <p class="ds-chart-card-subtitle">Upcoming / Overdue / Completed</p>
+                </div>
+            </div>
+            <div class="ds-chart-card-body" style="height: 260px;">
+                <canvas id="chartTeacherAssignments"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (!window.SkulCharts) return;
+    (function() {
+        function init() {
+            var weekLabels = @json($chartData['weekly_labels'] ?? []);
+            var weekPresent = @json($chartData['weekly_present'] ?? []);
+            var weekTotal = @json($chartData['weekly_total'] ?? []);
+            if (weekLabels.length) {
+                window.SkulCharts.createBarChart('chartWeeklyAttendance', {
+                    labels: weekLabels,
+                    datasets: [
+                        { label: 'Total', data: weekTotal, backgroundColor: '#E2E8F0', borderRadius: 6 },
+                        { label: 'Present', data: weekPresent, backgroundColor: '#8B5CF6', borderRadius: 6 },
+                    ],
+                });
+            }
 
-        const weekLabels = @json($chartData['weekly_labels']);
-        const weekPresent = @json($chartData['weekly_present']);
-        const weekTotal = @json($chartData['weekly_total']);
-        if (weekLabels.length) {
-            window.SkulCharts.createBarChart('chartWeeklyAttendance', {
-                labels: weekLabels,
-                datasets: [
-                    { label: 'Total', data: weekTotal, backgroundColor: '#E2E8F0', borderRadius: 6 },
-                    { label: 'Present', data: weekPresent, backgroundColor: '#10B981', borderRadius: 6 },
-                ],
-            });
+            var classLabels = @json($chartData['class_labels'] ?? []);
+            var classData = @json($chartData['class_data'] ?? []);
+            if (classLabels.length) {
+                window.SkulCharts.createDoughnutChart('chartTeacherClasses', {
+                    labels: classLabels,
+                    data: classData,
+                    colors: ['#6B7280', '#3B82F6', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#06B6D4'],
+                });
+            }
+
+            var assignLabels = @json($chartData['assignment_labels'] ?? []);
+            var assignData = @json($chartData['assignment_data'] ?? []);
+            if (assignLabels.length && assignData.some(function(v) { return v > 0; })) {
+                window.SkulCharts.createDoughnutChart('chartTeacherAssignments', {
+                    labels: assignLabels,
+                    data: assignData,
+                    colors: ['#3B82F6', '#EF4444', '#10B981'],
+                });
+            }
         }
-    });
+        if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+        init();
+    })();
 </script>
 @endpush
 @endsection

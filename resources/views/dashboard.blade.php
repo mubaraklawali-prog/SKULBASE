@@ -167,6 +167,79 @@
         </x-dashboard.widget-card>
     </div>
 
+    {{-- Super Admin Charts Row 1 --}}
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Student Growth</h3>
+                        <p class="ds-chart-card-subtitle">Platform-wide student registrations (last 12 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 280px;">
+                    <canvas id="saChartStudentGrowth"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-5">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Student Gender</h3>
+                        <p class="ds-chart-card-subtitle">Distribution across platform</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 280px;">
+                    <canvas id="saChartGenderDistribution"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Super Admin Charts Row 2 --}}
+    <div class="row g-4 mb-4">
+        <div class="col-xl-6 col-lg-6">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Revenue Trend</h3>
+                        <p class="ds-chart-card-subtitle">Monthly fee collections (last 12 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 280px;">
+                    <canvas id="saChartRevenueTrend"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-3">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">School Registrations</h3>
+                        <p class="ds-chart-card-subtitle">Monthly (last 12 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 280px;">
+                    <canvas id="saChartSchoolGrowth"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-3">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Teacher Growth</h3>
+                        <p class="ds-chart-card-subtitle">Monthly (last 12 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 280px;">
+                    <canvas id="saChartTeacherGrowth"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @elseif($isParent)
     {{-- ═══════════ PARENT DASHBOARD ═══════════ --}}
     <x-dashboard.welcome-banner :school="$school" :subscription="$subscription" :schoolSetting="$schoolSetting" />
@@ -461,6 +534,18 @@
             </div>
         </div>
         <div class="col-xl-4 col-lg-5">
+            {{-- Students by Gender --}}
+            <div class="ds-chart-card mb-4">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Students by Gender</h3>
+                        <p class="ds-chart-card-subtitle">Gender distribution</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 220px;">
+                    <canvas id="chartGenderDistribution"></canvas>
+                </div>
+            </div>
             {{-- Academic Overview --}}
             <div class="ds-widget-card">
                 <div class="ds-widget-card-header">
@@ -489,6 +574,36 @@
                     @else
                         <x-dashboard.empty-state message="No exam data available yet" icon="clipboard" size="sm" />
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Additional Analytics Row --}}
+    <div class="row g-4 mb-4">
+        <div class="col-xl-6 col-lg-6">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Attendance Trend</h3>
+                        <p class="ds-chart-card-subtitle">Monthly attendance rate (last 6 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 260px;">
+                    <canvas id="chartAttendanceTrend"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-lg-6">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Admissions Trend</h3>
+                        <p class="ds-chart-card-subtitle">Monthly admissions (last 6 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 260px;">
+                    <canvas id="chartAdmissionsTrend"></canvas>
                 </div>
             </div>
         </div>
@@ -681,46 +796,165 @@
     {{-- Charts Script --}}
     @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (!window.SkulCharts) return;
+        (function() {
+            function init() {
+                var isSuperAdmin = @json($isSuperAdmin);
 
-            const growthLabels = @json($chartData['student_growth_labels']);
-            const growthData = @json($chartData['student_growth_data']);
-            if (growthLabels.length) {
-                window.SkulCharts.createAreaChart('chartStudentGrowth', {
-                    labels: growthLabels,
-                    datasets: [{
-                        label: 'Students',
-                        data: growthData,
-                        color: '#5B21FF',
-                        backgroundColor: '#5B21FF18',
-                    }],
-                });
-            }
+                if (isSuperAdmin) {
+                    var saGrowthLabels = @json($chartData['student_growth_labels'] ?? []);
+                    var saGrowthData = @json($chartData['student_growth_data'] ?? []);
+                    if (saGrowthLabels.length) {
+                        window.SkulCharts.createAreaChart('saChartStudentGrowth', {
+                            labels: saGrowthLabels,
+                            datasets: [{
+                                label: 'Students',
+                                data: saGrowthData,
+                                color: '#3B82F6',
+                                backgroundColor: '#3B82F618',
+                            }],
+                        });
+                    }
 
-            const classLabels = @json($chartData['students_by_class_labels']);
-            const classData = @json($chartData['students_by_class_data']);
-            if (classLabels.length) {
-                window.SkulCharts.createDoughnutChart('chartStudentsByClass', {
-                    labels: classLabels,
-                    data: classData,
-                });
-            }
+                    var genderLabels = @json($chartData['gender_labels'] ?? []);
+                    var genderData = @json($chartData['gender_data'] ?? []);
+                    if (genderLabels.length) {
+                        window.SkulCharts.createDoughnutChart('saChartGenderDistribution', {
+                            labels: genderLabels,
+                            data: genderData,
+                            colors: ['#3B82F6', '#EC4899'],
+                        });
+                    }
 
-            const feeLabels = @json($chartData['fee_collection_labels']);
-            const feeData = @json($chartData['fee_collection_data']);
-            if (feeLabels.length) {
-                window.SkulCharts.createBarChart('chartFeeCollection', {
-                    labels: feeLabels,
-                    datasets: [{
-                        label: 'Collections',
-                        data: feeData,
-                        backgroundColor: '#10B981',
-                        borderRadius: 6,
-                    }],
-                });
+                    var revenueLabels = @json($chartData['revenue_labels'] ?? []);
+                    var revenueData = @json($chartData['revenue_data'] ?? []);
+                    if (revenueLabels.length) {
+                        window.SkulCharts.createBarChart('saChartRevenueTrend', {
+                            labels: revenueLabels,
+                            datasets: [{
+                                label: 'Revenue',
+                                data: revenueData,
+                                backgroundColor: '#F59E0B',
+                                borderRadius: 6,
+                            }],
+                        });
+                    }
+
+                    var schoolGrowthLabels = @json($chartData['school_growth_labels'] ?? []);
+                    var schoolGrowthData = @json($chartData['school_growth_data'] ?? []);
+                    if (schoolGrowthLabels.length) {
+                        window.SkulCharts.createAreaChart('saChartSchoolGrowth', {
+                            labels: schoolGrowthLabels,
+                            datasets: [{
+                                label: 'Schools',
+                                data: schoolGrowthData,
+                                color: '#8B5CF6',
+                                backgroundColor: '#8B5CF618',
+                            }],
+                        });
+                    }
+
+                    var teacherGrowthLabels = @json($chartData['teacher_growth_labels'] ?? []);
+                    var teacherGrowthData = @json($chartData['teacher_growth_data'] ?? []);
+                    if (teacherGrowthLabels.length) {
+                        window.SkulCharts.createAreaChart('saChartTeacherGrowth', {
+                            labels: teacherGrowthLabels,
+                            datasets: [{
+                                label: 'Teachers',
+                                data: teacherGrowthData,
+                                color: '#10B981',
+                                backgroundColor: '#10B98118',
+                            }],
+                        });
+                    }
+                } else {
+                    var growthLabels = @json($chartData['student_growth_labels'] ?? []);
+                    var growthData = @json($chartData['student_growth_data'] ?? []);
+                    if (growthLabels.length) {
+                        window.SkulCharts.createAreaChart('chartStudentGrowth', {
+                            labels: growthLabels,
+                            datasets: [{
+                                label: 'Students',
+                                data: growthData,
+                                color: '#3B82F6',
+                                backgroundColor: '#3B82F618',
+                            }],
+                        });
+                    }
+
+                    var classLabels = @json($chartData['students_by_class_labels'] ?? []);
+                    var classData = @json($chartData['students_by_class_data'] ?? []);
+                    if (classLabels.length) {
+                        window.SkulCharts.createDoughnutChart('chartStudentsByClass', {
+                            labels: classLabels,
+                            data: classData,
+                        });
+                    }
+
+                    var feeLabels = @json($chartData['fee_collection_labels'] ?? []);
+                    var feeData = @json($chartData['fee_collection_data'] ?? []);
+                    if (feeLabels.length) {
+                        window.SkulCharts.createBarChart('chartFeeCollection', {
+                            labels: feeLabels,
+                            datasets: [{
+                                label: 'Collections',
+                                data: feeData,
+                                backgroundColor: '#F59E0B',
+                                borderRadius: 6,
+                            }],
+                        });
+                    }
+
+                    var genLabels = @json($chartData['gender_labels'] ?? []);
+                    var genData = @json($chartData['gender_data'] ?? []);
+                    if (genLabels.length) {
+                        window.SkulCharts.createDoughnutChart('chartGenderDistribution', {
+                            labels: genLabels,
+                            data: genData,
+                            colors: ['#3B82F6', '#EC4899'],
+                        });
+                    }
+
+                    var attLabels = @json($chartData['attendance_trend_labels'] ?? []);
+                    var attData = @json($chartData['attendance_trend_data'] ?? []);
+                    if (attLabels.length) {
+                        window.SkulCharts.createAreaChart('chartAttendanceTrend', {
+                            labels: attLabels,
+                            datasets: [{
+                                label: 'Attendance %',
+                                data: attData,
+                                color: '#8B5CF6',
+                                backgroundColor: '#8B5CF618',
+                            }],
+                            options: {
+                                scales: {
+                                    y: {
+                                        min: 0,
+                                        max: 100,
+                                        ticks: { callback: function(v) { return v + '%'; } },
+                                    },
+                                },
+                            },
+                        });
+                    }
+
+                    var admLabels = @json($chartData['admissions_trend_labels'] ?? []);
+                    var admData = @json($chartData['admissions_trend_data'] ?? []);
+                    if (admLabels.length) {
+                        window.SkulCharts.createBarChart('chartAdmissionsTrend', {
+                            labels: admLabels,
+                            datasets: [{
+                                label: 'Admissions',
+                                data: admData,
+                                backgroundColor: '#06B6D4',
+                                borderRadius: 6,
+                            }],
+                        });
+                    }
+                }
             }
-        });
+            if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+            init();
+        })();
     </script>
     @endpush
 @endif

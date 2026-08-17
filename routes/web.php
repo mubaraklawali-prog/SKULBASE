@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AffiliateController;
+use App\Http\Controllers\AffiliateManagementController;
+use App\Http\Controllers\AffiliatePayoutController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AssessmentTypeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ExamController;
@@ -50,6 +54,7 @@ use App\Http\Controllers\TeacherProfileController;
 use App\Http\Controllers\TeacherScoreEntryController;
 use App\Http\Controllers\TeacherTimetableController;
 use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -85,18 +90,43 @@ Route::middleware('guest')->prefix('school')->name('school.')->group(function ()
         ->name('register.submit');
 });
 
+// Public Affiliate Registration
+Route::middleware('guest')->prefix('affiliates')->name('affiliates.')->group(function () {
+    Route::get('/register', [AffiliateController::class, 'showRegistrationForm'])
+        ->name('register');
+    Route::post('/register', [AffiliateController::class, 'register'])
+        ->name('register.store')
+        ->middleware('throttle:5,1');
+});
+
+// Affiliate Login (separate from the main school login flow)
+Route::middleware('guest')->group(function () {
+    Route::get('/affiliates/login', [AffiliateController::class, 'showLoginForm'])
+        ->name('affiliates.login');
+    Route::post('/affiliates/login', [AffiliateController::class, 'login'])
+        ->name('affiliates.login.submit')
+        ->middleware('throttle:5,1');
+});
+
 // Public Admission Form
 Route::get('/admissions/apply', [AdmissionController::class, 'form'])
     ->name('admissions.form');
 Route::post('/admissions/apply', [AdmissionController::class, 'submit'])
     ->name('admissions.submit');
 
+// Paystack Webhook (no auth, no CSRF)
+Route::post('/paystack/webhook', [WebhookController::class, 'handle'])
+    ->name('paystack.webhook')
+    ->middleware('throttle:60,1');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+});
+
 Route::middleware(['auth', 'school.approval', 'subscription'])->group(function () {
     Route::get('/dashboard', DashboardController::class)
         ->name('dashboard');
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
 
     Route::get('/change-password', [AuthController::class, 'showPasswordChangeForm'])
         ->name('password.change');
@@ -588,6 +618,42 @@ Route::middleware(['auth', 'school.approval', 'subscription'])->group(function (
                 ->name('subscriptions.destroy');
         });
 
+        // Affiliate Program Management (Super Admin only)
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('/affiliates', [AffiliateManagementController::class, 'index'])
+                ->name('affiliates.index');
+
+            Route::get('/affiliates/settings', [AffiliateManagementController::class, 'settings'])
+                ->name('affiliates.settings');
+
+            Route::put('/affiliates/settings', [AffiliateManagementController::class, 'updateSettings'])
+                ->name('affiliates.settings.update');
+
+            Route::get('/affiliates/{affiliate}', [AffiliateManagementController::class, 'show'])
+                ->name('affiliates.show');
+
+            Route::post('/affiliates/{affiliate}/activate', [AffiliateManagementController::class, 'activate'])
+                ->name('affiliates.activate');
+
+            Route::post('/affiliates/{affiliate}/suspend', [AffiliateManagementController::class, 'suspend'])
+                ->name('affiliates.suspend');
+
+            Route::post('/affiliates/{affiliate}/commissions/{commission}/approve', [AffiliateManagementController::class, 'approveCommission'])
+                ->name('affiliates.commissions.approve');
+
+            Route::post('/affiliates/{affiliate}/commissions/{commission}/cancel', [AffiliateManagementController::class, 'cancelCommission'])
+                ->name('affiliates.commissions.cancel');
+
+            Route::get('/payouts', [AffiliatePayoutController::class, 'index'])
+                ->name('payouts.index');
+
+            Route::post('/payouts/{payout}/approve', [AffiliatePayoutController::class, 'approve'])
+                ->name('payouts.approve');
+
+            Route::post('/payouts/{payout}/reject', [AffiliatePayoutController::class, 'reject'])
+                ->name('payouts.reject');
+        });
+
         // Report Cards
         Route::get('/results/report-cards', [ReportCardController::class, 'bulkSelector'])
             ->name('results.report-cards.bulk');
@@ -943,6 +1009,13 @@ Route::middleware(['auth', 'school.approval', 'subscription'])->group(function (
     Route::middleware('role:school_admin,teacher,student,parent')->group(function () {
         Route::get('/my-subscription', [SchoolSubscriptionController::class, 'index'])
             ->name('school.subscription.index');
+
+        Route::get('/checkout', [CheckoutController::class, 'checkout'])
+            ->name('school.subscription.checkout');
+        Route::post('/checkout/pay', [CheckoutController::class, 'pay'])
+            ->name('school.subscription.pay');
+        Route::get('/checkout/callback', [CheckoutController::class, 'callback'])
+            ->name('school.subscription.checkout.callback');
     });
 
     // Settings — School-level settings
@@ -995,4 +1068,13 @@ Route::middleware(['auth', 'school.approval', 'subscription'])->group(function (
         Route::post('/settings/backup-maintenance/disable-maintenance', [SettingsController::class, 'disableMaintenance'])
             ->name('settings.backup-maintenance.disable-maintenance');
     });
+});
+
+// Affiliate Portal
+Route::middleware(['auth', 'role:affiliate'])->prefix('affiliate')->name('affiliate.')->group(function () {
+    Route::get('/dashboard', [AffiliateController::class, 'dashboard'])
+        ->name('dashboard');
+
+    Route::post('/payouts', [AffiliateController::class, 'requestPayout'])
+        ->name('payouts.request');
 });

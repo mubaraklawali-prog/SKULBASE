@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use App\Models\School;
+use App\Services\AffiliateService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,8 @@ use Illuminate\View\View;
 class PendingSchoolController extends Controller
 {
     public function __construct(
-        private SubscriptionService $subscriptionService
+        private SubscriptionService $subscriptionService,
+        private AffiliateService $affiliateService
     ) {}
 
     public function index(Request $request): View
@@ -34,11 +36,7 @@ class PendingSchoolController extends Controller
     public function show(School $school): View
     {
         $admin = $school->users()->where('role', 'school_admin')->first();
-        $plan = null;
-
-        if ($admin) {
-            $plan = Plan::active()->first();
-        }
+        $plan = $school->selectedPlan ?? Plan::active()->first();
 
         return view('super-admin.pending-schools.show', compact('school', 'admin', 'plan'));
     }
@@ -56,12 +54,9 @@ class PendingSchoolController extends Controller
                 'approved_at' => now(),
             ]);
 
-            $admin = $school->users()->where('role', 'school_admin')->first();
-            if ($admin) {
-                $admin->forceFill(['force_password_change' => true])->save();
-            }
-
             $this->subscriptionService->createTrial($school);
+
+            $this->affiliateService->handleSchoolApproval($school);
         });
 
         return redirect()

@@ -84,10 +84,32 @@ class TeacherDashboardController extends Controller
             ->orderBy('attendance_date')
             ->get();
 
+        $totalAssignments = Assignment::where('teacher_id', $teacher->id)
+            ->where('school_id', $teacher->school_id)
+            ->count();
+
+        $overdueAssignments = Assignment::where('teacher_id', $teacher->id)
+            ->where('school_id', $teacher->school_id)
+            ->where('due_date', '<', Carbon::today())
+            ->count();
+
+        $upcomingCount = Assignment::where('teacher_id', $teacher->id)
+            ->where('school_id', $teacher->school_id)
+            ->where('due_date', '>=', Carbon::today())
+            ->count();
+
+        $completedCount = max(0, $totalAssignments - $overdueAssignments - $upcomingCount);
+
+        $classStudentData = $classes->pluck('students_count', 'name')->toArray();
+
         $chartData = [
             'weekly_labels' => $weeklyAttendance->pluck('attendance_date')->map(fn ($d) => Carbon::parse($d)->format('D'))->toArray(),
             'weekly_present' => $weeklyAttendance->pluck('present')->map(fn ($v) => (int) $v)->toArray(),
             'weekly_total' => $weeklyAttendance->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
+            'assignment_labels' => ['Upcoming', 'Overdue', 'Completed'],
+            'assignment_data' => [$upcomingCount, $overdueAssignments, $completedCount],
+            'class_labels' => array_keys($classStudentData),
+            'class_data' => array_values($classStudentData),
         ];
 
         $teacherStats = [

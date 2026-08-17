@@ -12,10 +12,17 @@ class SubscriptionService
 {
     private const GRACE_PERIOD_DAYS = 7;
 
-    public function createTrial(School $school): Subscription
+    public function __construct(
+        public AffiliateService $affiliateService
+    ) {}
+
+    public function createTrial(School $school, ?Plan $plan = null): Subscription
     {
-        $plan = Plan::active()->where('is_unlimited', true)->first()
-            ?? Plan::active()->orderByDesc('sort_order')->first();
+        if (! $plan) {
+            $plan = $school->selectedPlan
+                ?? Plan::active()->where('is_unlimited', true)->first()
+                ?? Plan::active()->orderByDesc('sort_order')->first();
+        }
 
         if (! $plan) {
             $plan = Plan::firstOrCreate(
@@ -69,7 +76,7 @@ class SubscriptionService
             ? $plan->yearly_price
             : $plan->monthly_price;
 
-        return DB::transaction(function () use ($subscription, $billingCycle, $now, $expiresAt, $amount) {
+        $subscription = DB::transaction(function () use ($subscription, $billingCycle, $now, $expiresAt, $amount) {
             $this->deactivateExisting($subscription->school);
 
             $subscription->update([
@@ -87,6 +94,10 @@ class SubscriptionService
 
             return $subscription->fresh();
         });
+
+        $this->affiliateService->handleSubscriptionPayment($subscription);
+
+        return $subscription;
     }
 
     public function renew(Subscription $subscription): Subscription
@@ -100,7 +111,7 @@ class SubscriptionService
             ? $plan->yearly_price
             : $plan->monthly_price;
 
-        return DB::transaction(function () use ($subscription, $now, $expiresAt, $amount) {
+        $subscription = DB::transaction(function () use ($subscription, $now, $expiresAt, $amount) {
             $subscription->update([
                 'status' => 'active',
                 'is_trial' => false,
@@ -113,6 +124,10 @@ class SubscriptionService
 
             return $subscription->fresh();
         });
+
+        $this->affiliateService->handleSubscriptionPayment($subscription);
+
+        return $subscription;
     }
 
     public function expire(Subscription $subscription): Subscription
@@ -174,7 +189,7 @@ class SubscriptionService
         return $transitions;
     }
 
-    private function deactivateExisting(School $school): void
+    public function deactivateExisting(School $school): void
     {
         $school->subscriptions()
             ->whereIn('status', ['trial', 'active', 'grace'])

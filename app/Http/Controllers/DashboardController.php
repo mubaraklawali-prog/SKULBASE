@@ -46,6 +46,10 @@ class DashboardController extends Controller
             return redirect()->route('teacher.dashboard');
         }
 
+        if ($user->role === 'affiliate') {
+            return redirect()->route('affiliate.dashboard');
+        }
+
         if ($isSuperAdmin) {
             return $this->superAdminDashboard();
         }
@@ -87,6 +91,55 @@ class DashboardController extends Controller
                 'color' => $s->is_active ? '#1e8a3e' : '#6c757d',
             ]);
 
+        $twelveMonthsAgo = Carbon::now()->subMonths(11)->startOfMonth();
+
+        $studentGrowth = Student::where('created_at', '>=', $twelveMonthsAgo)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy(fn ($s) => $s->created_at->format('M Y'))
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        $schoolGrowth = School::where('created_at', '>=', $twelveMonthsAgo)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy(fn ($s) => $s->created_at->format('M Y'))
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        $revenueTrend = FeePayment::where('payment_date', '>=', $twelveMonthsAgo)
+            ->orderBy('payment_date')
+            ->get()
+            ->groupBy(fn ($p) => $p->payment_date->format('M Y'))
+            ->map(fn ($group) => (float) $group->sum('amount_paid'))
+            ->toArray();
+
+        $genderDistribution = Student::selectRaw('gender, count(*) as count')
+            ->groupBy('gender')
+            ->get()
+            ->pluck('count', 'gender')
+            ->toArray();
+
+        $teacherGrowth = Teacher::where('created_at', '>=', $twelveMonthsAgo)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy(fn ($t) => $t->created_at->format('M Y'))
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        $chartData = [
+            'student_growth_labels' => array_keys($studentGrowth),
+            'student_growth_data' => array_values($studentGrowth),
+            'school_growth_labels' => array_keys($schoolGrowth),
+            'school_growth_data' => array_values($schoolGrowth),
+            'revenue_labels' => array_keys($revenueTrend),
+            'revenue_data' => array_values($revenueTrend),
+            'gender_labels' => array_keys($genderDistribution),
+            'gender_data' => array_values($genderDistribution),
+            'teacher_growth_labels' => array_keys($teacherGrowth),
+            'teacher_growth_data' => array_values($teacherGrowth),
+        ];
+
         return view('dashboard', [
             'school' => null,
             'stats' => null,
@@ -97,6 +150,7 @@ class DashboardController extends Controller
             'isSuperAdmin' => true,
             'platformStats' => $platformStats,
             'recentSchools' => $recentSchools,
+            'chartData' => $chartData,
         ]);
     }
 
@@ -195,6 +249,34 @@ class DashboardController extends Controller
             'active_announcements' => $activeAnnouncements->count(),
         ];
 
+        $genderDistribution = Student::where('school_id', $schoolId)
+            ->selectRaw('gender, count(*) as count')
+            ->groupBy('gender')
+            ->get()
+            ->pluck('count', 'gender')
+            ->toArray();
+
+        $attendanceTrend = Attendance::where('school_id', $schoolId)
+            ->where('attendance_date', '>=', $sixMonthsAgo)
+            ->orderBy('attendance_date')
+            ->get()
+            ->groupBy(fn ($a) => $a->attendance_date->format('M Y'))
+            ->map(function ($group) {
+                $total = $group->count();
+                $present = $group->whereIn('status', ['present', 'late', 'excused'])->count();
+
+                return $total > 0 ? round(($present / $total) * 100, 1) : 0;
+            })
+            ->toArray();
+
+        $admissionsTrend = Admission::where('school_id', $schoolId)
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy(fn ($a) => $a->created_at->format('M Y'))
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
         $chartData = [
             'student_growth_labels' => array_keys($studentGrowth),
             'student_growth_data' => array_values($studentGrowth),
@@ -202,6 +284,12 @@ class DashboardController extends Controller
             'fee_collection_data' => array_values($feeCollection),
             'students_by_class_labels' => array_keys($studentsByClass),
             'students_by_class_data' => array_values($studentsByClass),
+            'gender_labels' => array_keys($genderDistribution),
+            'gender_data' => array_values($genderDistribution),
+            'attendance_trend_labels' => array_keys($attendanceTrend),
+            'attendance_trend_data' => array_values($attendanceTrend),
+            'admissions_trend_labels' => array_keys($admissionsTrend),
+            'admissions_trend_data' => array_values($admissionsTrend),
         ];
 
         return view('dashboard', compact(

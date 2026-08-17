@@ -116,6 +116,41 @@
             font-weight: 500;
         }
         .login-link a:hover { text-decoration: underline; }
+        .plan-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+        .plan-card {
+            flex: 1;
+            min-width: 200px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .plan-card:hover { border-color: var(--primary, #5B21FF); }
+        .plan-card.selected { border-color: var(--primary, #5B21FF); background: rgba(91, 33, 255, 0.04); }
+        .plan-card input[type="radio"] { display: none; }
+        .plan-card-name { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 8px; }
+        .plan-card-price { font-size: 22px; font-weight: 700; color: var(--primary, #5B21FF); margin-bottom: 4px; }
+        .plan-card-price s { font-size: 14px; color: #999; font-weight: 400; margin-right: 4px; }
+        .plan-card-detail { font-size: 13px; color: #6c757d; margin-bottom: 2px; }
+        .plan-card-trial { font-size: 12px; color: #198754; font-weight: 500; margin-top: 8px; }
+        .plan-card-discount { font-size: 12px; color: #dc3545; font-weight: 600; margin-top: 4px; }
+        .plan-card-unlimited { font-size: 12px; color: var(--primary, #5B21FF); font-weight: 500; }
+        .plan-card-recommended {
+            border-color: var(--primary, #5B21FF);
+            background: linear-gradient(135deg, rgba(91, 33, 255, 0.04) 0%, rgba(91, 33, 255, 0.02) 100%);
+        }
+        .plan-card-recommended:hover { background: rgba(91, 33, 255, 0.06); }
+        .plan-card-recommended.selected { background: rgba(91, 33, 255, 0.08); }
+        .plan-card-badge {
+            position: absolute; top: -10px; right: 12px;
+            background: var(--primary, #5B21FF); color: #fff;
+            font-size: 11px; font-weight: 700; padding: 3px 10px;
+            border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .plan-card-free-price { font-size: 28px; font-weight: 700; color: var(--primary, #5B21FF); margin-bottom: 4px; }
+        .plan-card-message { font-size: 13px; color: #555; margin-top: 8px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -229,27 +264,80 @@
                                         <div class="sb-form-error">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="admin-password" class="sb-form-label">Password <span class="required">*</span></label>
+                                    <input type="password" name="password" id="admin-password" class="sb-form-input @error('password') is-invalid @enderror"
+                                           placeholder="Min. 8 characters" required>
+                                    @error('password')
+                                        <div class="sb-form-error">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="admin-password-confirm" class="sb-form-label">Confirm Password <span class="required">*</span></label>
+                                    <input type="password" name="password_confirmation" id="admin-password-confirm" class="sb-form-input"
+                                           placeholder="Re-enter password" required>
+                                </div>
                             </div>
 
                             {{-- Subscription --}}
                             <div class="section-title mt-4">
                                 <span class="badge">3</span> Subscription
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="plan-id" class="sb-form-label">Preferred Plan <span class="required">*</span></label>
-                                    <select name="plan_id" id="plan-id" class="sb-form-select @error('plan_id') is-invalid @enderror" required>
-                                        <option value="">Select a plan...</option>
-                                        @foreach ($plans as $plan)
-                                            <option value="{{ $plan->id }}" {{ old('plan_id') == $plan->id ? 'selected' : '' }}>
-                                                {{ $plan->name }} - {{ $plan->formattedMonthlyPrice() }}/month
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('plan_id')
-                                        <div class="sb-form-error">{{ $message }}</div>
-                                    @enderror
+                            <div class="mb-3">
+                                <label class="sb-form-label">Choose a Plan <span class="required">*</span></label>
+                                <div class="plan-cards">
+                                    @foreach ($plans as $plan)
+                                        @if($plan->slug === 'free-trial')
+                                            <label class="plan-card plan-card-recommended {{ old('plan_id') == $plan->id ? 'selected' : '' }}" onclick="selectPlan(this)">
+                                                <span class="plan-card-badge">Recommended</span>
+                                                <input type="radio" name="plan_id" value="{{ $plan->id }}" {{ old('plan_id') == $plan->id ? 'checked' : '' }}>
+                                                <div class="plan-card-name">{{ $plan->name }}</div>
+                                                <div class="plan-card-free-price">FREE</div>
+                                                <div class="plan-card-detail">30 days, no payment required</div>
+                                                <div class="plan-card-message">Try Skulbase FREE for 30 days. No payment required. Experience the system with your school, then choose the plan that fits you.</div>
+                                            </label>
+                                        @else
+                                            <label class="plan-card {{ old('plan_id') == $plan->id ? 'selected' : '' }}" onclick="selectPlan(this)">
+                                                <input type="radio" name="plan_id" value="{{ $plan->id }}" {{ old('plan_id') == $plan->id ? 'checked' : '' }}>
+                                                <div class="plan-card-name">{{ $plan->name }}</div>
+                                                @if($plan->monthly_price == 0 && $plan->yearly_price == 0)
+                                                    <div class="plan-card-price">₦0</div>
+                                                @elseif($plan->isDiscountActive() && in_array($plan->discount_scope, ['monthly', 'both']))
+                                                    <div class="plan-card-price">
+                                                        <s>{{ $plan->formattedMonthlyPrice() }}</s>
+                                                        {{ $plan->formattedDiscountedMonthlyPrice() }}
+                                                    </div>
+                                                @else
+                                                    <div class="plan-card-price">{{ $plan->formattedMonthlyPrice() }}</div>
+                                                @endif
+                                                <div class="plan-card-detail">per month</div>
+                                                @if($plan->monthly_price > 0 || $plan->yearly_price > 0)
+                                                    @if($plan->isDiscountActive() && in_array($plan->discount_scope, ['annual', 'both']))
+                                                        <div class="plan-card-detail">
+                                                            Yearly: <s>{{ $plan->formattedYearlyPrice() }}</s>
+                                                            <strong style="color: #dc3545;">{{ $plan->formattedDiscountedYearlyPrice() }}</strong>
+                                                        </div>
+                                                    @else
+                                                        <div class="plan-card-detail">Yearly: {{ $plan->formattedYearlyPrice() }}</div>
+                                                    @endif
+                                                @endif
+                                                @if($plan->is_unlimited)
+                                                    <div class="plan-card-unlimited">Unlimited students</div>
+                                                @else
+                                                    <div class="plan-card-detail">{{ number_format($plan->student_limit ?? 0) }} students</div>
+                                                @endif
+                                                <div class="plan-card-trial">{{ $plan->trial_days }}-day free trial</div>
+                                                @if($plan->isDiscountActive())
+                                                    <div class="plan-card-discount">{{ rtrim(rtrim(number_format($plan->discount_percentage, 2), '0'), '.') }}% OFF — {{ $plan->discount_scope_label }}</div>
+                                                @endif
+                                            </label>
+                                        @endif
+                                    @endforeach
                                 </div>
+                                @error('plan_id')
+                                    <div class="sb-form-error">{{ $message }}</div>
+                                @enderror
+                            </div>
                                 <div class="col-md-12 mb-3">
                                     <div class="form-check">
                                         <input type="checkbox" name="terms" id="terms" class="form-check-input @error('terms') is-invalid @enderror"
@@ -282,5 +370,14 @@
             </div>
         </div>
     </div>
+    <script>
+        function selectPlan(el) {
+            document.querySelectorAll('.plan-card').forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            el.classList.add('selected');
+            el.querySelector('input[type="radio"]').checked = true;
+        }
+    </script>
 </body>
 </html>

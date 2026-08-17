@@ -54,6 +54,7 @@ it('validates required fields on registration', function (): void {
         'school_email',
         'admin_name',
         'admin_email',
+        'password',
         'plan_id',
         'terms',
     ]);
@@ -72,6 +73,8 @@ it('validates email uniqueness for school', function (): void {
         'school_email' => 'existing@test.com',
         'admin_name' => 'Admin User',
         'admin_email' => 'admin@test.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
         'terms' => '1',
     ]);
@@ -91,6 +94,8 @@ it('validates email uniqueness for admin user', function (): void {
         'school_email' => 'school@test.com',
         'admin_name' => 'Admin User',
         'admin_email' => 'admin@test.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
         'terms' => '1',
     ]);
@@ -104,6 +109,8 @@ it('validates plan exists', function (): void {
         'school_email' => 'school@test.com',
         'admin_name' => 'Admin User',
         'admin_email' => 'admin@test.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => 9999,
         'terms' => '1',
     ]);
@@ -117,6 +124,8 @@ it('validates terms acceptance', function (): void {
         'school_email' => 'school@test.com',
         'admin_name' => 'Admin User',
         'admin_email' => 'admin@test.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
     ]);
 
@@ -133,6 +142,8 @@ it('successfully registers a school with pending status', function (): void {
         'admin_name' => 'John Doe',
         'admin_email' => 'john@greenfield.com',
         'admin_phone' => '08098765432',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
         'terms' => '1',
     ]);
@@ -166,6 +177,8 @@ it('generates unique slug for school', function (): void {
         'school_email' => 'greenfield2@test.com',
         'admin_name' => 'Admin',
         'admin_email' => 'admin@greenfield2.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
         'terms' => '1',
     ]);
@@ -180,6 +193,8 @@ it('sets school as inactive and pending on registration', function (): void {
         'school_email' => 'new@test.com',
         'admin_name' => 'Admin',
         'admin_email' => 'admin@new.com',
+        'password' => 'TestPass1',
+        'password_confirmation' => 'TestPass1',
         'plan_id' => $this->plan->id,
         'terms' => '1',
     ]);
@@ -485,7 +500,7 @@ it('approved school admin can login after approval', function (): void {
         'password' => 'password',
     ]);
 
-    $response->assertRedirect(route('password.change'));
+    $response->assertRedirect(route('dashboard'));
 });
 
 // ── Rejection Tests ─────────────────────────────────────

@@ -11,6 +11,18 @@ class PlanSeeder extends Seeder
     {
         $plans = [
             [
+                'name' => 'Free Trial',
+                'slug' => 'free-trial',
+                'description' => 'Try Skulbase free for 30 days. No payment required.',
+                'monthly_price' => 0,
+                'yearly_price' => 0,
+                'student_limit' => null,
+                'is_unlimited' => true,
+                'trial_days' => 30,
+                'is_active' => true,
+                'sort_order' => 0,
+            ],
+            [
                 'name' => 'Starter',
                 'slug' => 'starter',
                 'description' => 'Perfect for small schools getting started with digital management.',

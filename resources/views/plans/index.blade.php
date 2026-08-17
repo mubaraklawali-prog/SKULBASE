@@ -46,7 +46,8 @@
                             <th>Monthly Price</th>
                             <th>Yearly Price</th>
                             <th>Student Limit</th>
-                            <th>Trial Days</th>
+                            <th>Trial</th>
+                            <th>Discount</th>
                             <th>Status</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
@@ -58,8 +59,24 @@
                                     <strong>{{ $plan->name }}</strong>
                                     <div style="font-size: 12px; color: #6c757d;">{{ $plan->slug }}</div>
                                 </td>
-                                <td><strong>{{ $plan->formattedMonthlyPrice() }}</strong></td>
-                                <td><strong>{{ $plan->formattedYearlyPrice() }}</strong></td>
+                                <td>
+                                    @if($plan->isDiscountActive() && in_array($plan->discount_scope, ['monthly', 'both']))
+                                        <span style="text-decoration: line-through; color: #999; font-size: 12px;">{{ $plan->formattedMonthlyPrice() }}</span>
+                                        <br>
+                                        <strong style="color: #dc3545;">{{ $plan->formattedDiscountedMonthlyPrice() }}</strong>
+                                    @else
+                                        <strong>{{ $plan->formattedMonthlyPrice() }}</strong>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($plan->isDiscountActive() && in_array($plan->discount_scope, ['annual', 'both']))
+                                        <span style="text-decoration: line-through; color: #999; font-size: 12px;">{{ $plan->formattedYearlyPrice() }}</span>
+                                        <br>
+                                        <strong style="color: #dc3545;">{{ $plan->formattedDiscountedYearlyPrice() }}</strong>
+                                    @else
+                                        <strong>{{ $plan->formattedYearlyPrice() }}</strong>
+                                    @endif
+                                </td>
                                 <td>
                                     @if($plan->is_unlimited)
                                         <span class="sb-badge sb-badge-info">Unlimited</span>
@@ -67,7 +84,15 @@
                                         {{ number_format($plan->student_limit ?? 0) }}
                                     @endif
                                 </td>
-                                <td>{{ $plan->trial_days }} days</td>
+                                <td>{{ $plan->trial_days }}d</td>
+                                <td>
+                                    @if($plan->isDiscountActive())
+                                        <span class="sb-badge sb-badge-active">{{ $plan->discount_percentage }}% off</span>
+                                        <div style="font-size: 11px; color: #6c757d; margin-top: 2px;">{{ $plan->discount_scope_label }}</div>
+                                    @else
+                                        <span style="color: #999;">None</span>
+                                    @endif
+                                </td>
                                 <td>
                                     @if($plan->is_active)
                                         <span class="sb-badge sb-badge-active">Active</span>
@@ -102,7 +127,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" style="padding: 40px 20px; text-align: center; color: #6c757d;">
+                                <td colspan="8" style="padding: 40px 20px; text-align: center; color: #6c757d;">
                                     <p style="margin: 0; font-size: 15px;">No plans found.</p>
                                     <a href="{{ route('plans.create') }}" style="color: var(--primary); font-weight: 500; text-decoration: none;">Add your first plan</a>
                                 </td>

@@ -12,6 +12,9 @@ class CheckSubscription
 {
     private const SUBSCRIPTION_ROUTES = [
         'school.subscription.index',
+        'school.subscription.checkout',
+        'school.subscription.pay',
+        'school.subscription.checkout.callback',
     ];
 
     public function __construct(

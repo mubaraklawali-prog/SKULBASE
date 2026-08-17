@@ -30,7 +30,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
-            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers()],
+            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers(), 'regex:/^\S+$/'],
         ]);
 
         $user = User::create([
@@ -86,6 +86,10 @@ class AuthController extends Controller
                 return redirect()->route('parent.dashboard');
             }
 
+            if ($user->role === 'affiliate') {
+                return redirect()->route('affiliate.dashboard');
+            }
+
             return redirect()->route('dashboard');
         }
 
@@ -108,7 +112,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'current_password' => 'required',
-            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers()],
+            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers(), 'regex:/^\S+$/'],
         ]);
 
         $user = Auth::user();
@@ -162,7 +166,7 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers()],
+            'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers(), 'regex:/^\S+$/'],
         ]);
 
         $status = Password::broker()->reset(

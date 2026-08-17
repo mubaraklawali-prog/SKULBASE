@@ -69,12 +69,26 @@
 
                     <div class="mb-3">
                         <label class="sb-form-label">Monthly Price</label>
-                        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #333;">{{ $plan->formattedMonthlyPrice() }}</p>
+                        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #333;">
+                            @if($plan->isDiscountActive() && in_array($plan->discount_scope, ['monthly', 'both']))
+                                <span style="text-decoration: line-through; color: #999; font-size: 14px;">{{ $plan->formattedMonthlyPrice() }}</span>
+                                <span style="color: #dc3545;">{{ $plan->formattedDiscountedMonthlyPrice() }}</span>
+                            @else
+                                {{ $plan->formattedMonthlyPrice() }}
+                            @endif
+                        </p>
                     </div>
 
                     <div class="mb-3">
                         <label class="sb-form-label">Yearly Price</label>
-                        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #333;">{{ $plan->formattedYearlyPrice() }}</p>
+                        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #333;">
+                            @if($plan->isDiscountActive() && in_array($plan->discount_scope, ['annual', 'both']))
+                                <span style="text-decoration: line-through; color: #999; font-size: 14px;">{{ $plan->formattedYearlyPrice() }}</span>
+                                <span style="color: #dc3545;">{{ $plan->formattedDiscountedYearlyPrice() }}</span>
+                            @else
+                                {{ $plan->formattedYearlyPrice() }}
+                            @endif
+                        </p>
                     </div>
 
                     <div class="mb-3">
@@ -98,6 +112,53 @@
                         <p style="margin: 0; font-size: 15px; color: #333;">{{ $plan->sort_order }}</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Discount Details --}}
+    <div class="card stat-card mb-4">
+        <div class="card-body" style="padding: 24px;">
+            <h5 style="font-weight: 600; margin-bottom: 20px; color: #1a1a2e;">Discount Settings</h5>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="sb-form-label">Discount Percentage</label>
+                    <p style="margin: 0; font-size: 15px; color: #333;">{{ $plan->discount_percentage }}%</p>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="sb-form-label">Scope</label>
+                    <p style="margin: 0; font-size: 15px; color: #333;">{{ $plan->discount_scope_label }}</p>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="sb-form-label">Start Date</label>
+                    <p style="margin: 0; font-size: 15px; color: #333;">{{ $plan->discount_start_date?->format('d M Y') ?? 'Immediate' }}</p>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="sb-form-label">End Date</label>
+                    <p style="margin: 0; font-size: 15px; color: #333;">{{ $plan->discount_end_date?->format('d M Y') ?? 'No expiry' }}</p>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                @if($plan->isDiscountActive())
+                    <div class="alert alert-success" style="border-radius: 8px; font-size: 14px; margin-bottom: 0;">
+                        <strong>Active Discount:</strong> {{ $plan->discount_percentage }}% off
+                        @if(in_array($plan->discount_scope, ['monthly', 'both']))
+                            — Monthly: <s>{{ $plan->formattedMonthlyPrice() }}</s> → <strong>{{ $plan->formattedDiscountedMonthlyPrice() }}</strong>
+                        @endif
+                        @if(in_array($plan->discount_scope, ['annual', 'both']))
+                            — Yearly: <s>{{ $plan->formattedYearlyPrice() }}</s> → <strong>{{ $plan->formattedDiscountedYearlyPrice() }}</strong>
+                        @endif
+                    </div>
+                @else
+                    <div class="alert alert-secondary" style="border-radius: 8px; font-size: 14px; margin-bottom: 0;">
+                        No active discount. Prices shown at regular rate.
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -179,6 +179,88 @@
                     </div>
                 </div>
 
+                {{-- Discount Settings --}}
+                <div class="section-title mt-4 mb-3" style="font-size: 15px;">
+                    Discount Settings
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="discount_percentage" class="sb-form-label">Discount %</label>
+                        <input
+                            type="number"
+                            name="discount_percentage"
+                            id="discount_percentage"
+                            value="{{ old('discount_percentage', $plan->discount_percentage) }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            class="sb-form-input @error('discount_percentage') is-invalid @enderror"
+                        >
+                        <small class="text-muted">0 = no discount</small>
+                        @error('discount_percentage')
+                            <div class="sb-form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label for="discount_start_date" class="sb-form-label">Discount Start Date</label>
+                        <input
+                            type="date"
+                            name="discount_start_date"
+                            id="discount_start_date"
+                            value="{{ old('discount_start_date', $plan->discount_start_date?->format('Y-m-d')) }}"
+                            class="sb-form-input @error('discount_start_date') is-invalid @enderror"
+                        >
+                        <small class="text-muted">Leave empty for immediate</small>
+                        @error('discount_start_date')
+                            <div class="sb-form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label for="discount_end_date" class="sb-form-label">Discount End Date</label>
+                        <input
+                            type="date"
+                            name="discount_end_date"
+                            id="discount_end_date"
+                            value="{{ old('discount_end_date', $plan->discount_end_date?->format('Y-m-d')) }}"
+                            class="sb-form-input @error('discount_end_date') is-invalid @enderror"
+                        >
+                        <small class="text-muted">Leave empty for no expiry</small>
+                        @error('discount_end_date')
+                            <div class="sb-form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label for="discount_scope" class="sb-form-label">Apply Discount To</label>
+                        <select
+                            name="discount_scope"
+                            id="discount_scope"
+                            class="sb-form-select @error('discount_scope') is-invalid @enderror"
+                        >
+                            <option value="both" {{ old('discount_scope', $plan->discount_scope ?? 'both') === 'both' ? 'selected' : '' }}>Both Cycles</option>
+                            <option value="monthly" {{ old('discount_scope', $plan->discount_scope ?? '') === 'monthly' ? 'selected' : '' }}>Monthly Only</option>
+                            <option value="annual" {{ old('discount_scope', $plan->discount_scope ?? '') === 'annual' ? 'selected' : '' }}>Annual Only</option>
+                        </select>
+                        @error('discount_scope')
+                            <div class="sb-form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                @if($plan->isDiscountActive())
+                    <div class="alert alert-info" style="border-radius: 8px; font-size: 14px; margin-bottom: 16px;">
+                        <strong>Active Discount:</strong> {{ $plan->discount_percentage }}% off
+                        @if(in_array($plan->discount_scope, ['monthly', 'both']))
+                            — Monthly: <s>{{ $plan->formattedMonthlyPrice() }}</s> → <strong>{{ $plan->formattedDiscountedMonthlyPrice() }}</strong>
+                        @endif
+                        @if(in_array($plan->discount_scope, ['annual', 'both']))
+                            — Yearly: <s>{{ $plan->formattedYearlyPrice() }}</s> → <strong>{{ $plan->formattedDiscountedYearlyPrice() }}</strong>
+                        @endif
+                    </div>
+                @endif
+
                 <div class="d-flex gap-2 mt-2">
                     <button type="submit" class="sb-btn sb-btn-primary">
                         Update Plan

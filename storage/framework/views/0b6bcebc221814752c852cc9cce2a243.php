@@ -44,7 +44,8 @@
                             <th>Monthly Price</th>
                             <th>Yearly Price</th>
                             <th>Student Limit</th>
-                            <th>Trial Days</th>
+                            <th>Trial</th>
+                            <th>Discount</th>
                             <th>Status</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
@@ -56,8 +57,24 @@
                                     <strong><?php echo e($plan->name); ?></strong>
                                     <div style="font-size: 12px; color: #6c757d;"><?php echo e($plan->slug); ?></div>
                                 </td>
-                                <td><strong><?php echo e($plan->formattedMonthlyPrice()); ?></strong></td>
-                                <td><strong><?php echo e($plan->formattedYearlyPrice()); ?></strong></td>
+                                <td>
+                                    <?php if($plan->isDiscountActive() && in_array($plan->discount_scope, ['monthly', 'both'])): ?>
+                                        <span style="text-decoration: line-through; color: #999; font-size: 12px;"><?php echo e($plan->formattedMonthlyPrice()); ?></span>
+                                        <br>
+                                        <strong style="color: #dc3545;"><?php echo e($plan->formattedDiscountedMonthlyPrice()); ?></strong>
+                                    <?php else: ?>
+                                        <strong><?php echo e($plan->formattedMonthlyPrice()); ?></strong>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if($plan->isDiscountActive() && in_array($plan->discount_scope, ['annual', 'both'])): ?>
+                                        <span style="text-decoration: line-through; color: #999; font-size: 12px;"><?php echo e($plan->formattedYearlyPrice()); ?></span>
+                                        <br>
+                                        <strong style="color: #dc3545;"><?php echo e($plan->formattedDiscountedYearlyPrice()); ?></strong>
+                                    <?php else: ?>
+                                        <strong><?php echo e($plan->formattedYearlyPrice()); ?></strong>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if($plan->is_unlimited): ?>
                                         <span class="sb-badge sb-badge-info">Unlimited</span>
@@ -66,7 +83,15 @@
 
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo e($plan->trial_days); ?> days</td>
+                                <td><?php echo e($plan->trial_days); ?>d</td>
+                                <td>
+                                    <?php if($plan->isDiscountActive()): ?>
+                                        <span class="sb-badge sb-badge-active"><?php echo e($plan->discount_percentage); ?>% off</span>
+                                        <div style="font-size: 11px; color: #6c757d; margin-top: 2px;"><?php echo e($plan->discount_scope_label); ?></div>
+                                    <?php else: ?>
+                                        <span style="color: #999;">None</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if($plan->is_active): ?>
                                         <span class="sb-badge sb-badge-active">Active</span>
@@ -102,7 +127,7 @@
                             </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
-                                <td colspan="7" style="padding: 40px 20px; text-align: center; color: #6c757d;">
+                                <td colspan="8" style="padding: 40px 20px; text-align: center; color: #6c757d;">
                                     <p style="margin: 0; font-size: 15px;">No plans found.</p>
                                     <a href="<?php echo e(route('plans.create')); ?>" style="color: var(--primary); font-weight: 500; text-decoration: none;">Add your first plan</a>
                                 </td>

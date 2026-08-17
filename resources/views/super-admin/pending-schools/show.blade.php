@@ -84,7 +84,7 @@
                         <form method="POST" action="{{ route('pending-schools.approve', $school) }}">
                             @csrf
                             <button type="submit" class="sb-btn sb-btn-outline-success" style="width: 100%;"
-                                    onclick="return confirm('Are you sure you want to approve this school? A 30-day trial will be activated.')">
+                                    onclick="return confirm('Are you sure you want to approve this school? A {{ $plan->trial_days ?? 30 }}-day trial on {{ $plan->name ?? 'selected plan' }} will be activated.')">
                                 Approve Registration
                             </button>
                         </form>
@@ -109,8 +109,14 @@
                     </div>
                     <div class="mb-2">
                         <span class="text-muted" style="font-size: 13px;">Plan:</span>
-                        <span style="font-weight: 500;">{{ $school->name }}</span>
+                        <span style="font-weight: 500;">{{ $plan->name ?? 'Not selected' }}</span>
                     </div>
+                    @if($plan)
+                    <div class="mb-2">
+                        <span class="text-muted" style="font-size: 13px;">Trial:</span>
+                        <span>{{ $plan->trial_days }} days</span>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

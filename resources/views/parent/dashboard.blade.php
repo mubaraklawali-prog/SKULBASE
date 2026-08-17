@@ -292,5 +292,108 @@
         </x-dashboard.widget-card>
     </div>
 
+    {{-- Charts Section --}}
+    @if(!empty($chartData) && count($chartData['attendance_trend_labels'] ?? []) > 0)
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Attendance Trend</h3>
+                        <p class="ds-chart-card-subtitle">Monthly rate (last 6 months)</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartAttendance"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Fee Breakdown</h3>
+                        <p class="ds-chart-card-subtitle">Paid vs Outstanding</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartFees"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+            <div class="ds-chart-card">
+                <div class="ds-chart-card-header">
+                    <div>
+                        <h3 class="ds-chart-card-title">Children Performance</h3>
+                        <p class="ds-chart-card-subtitle">Average scores by child</p>
+                    </div>
+                </div>
+                <div class="ds-chart-card-body" style="height: 240px;">
+                    <canvas id="parentChartResults"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
 @endif
+
+@push('scripts')
+<script>
+    (function() {
+        function init() {
+            var attLabels = @json($chartData['attendance_trend_labels'] ?? []);
+            var attData = @json($chartData['attendance_trend_data'] ?? []);
+            if (attLabels.length) {
+                window.SkulCharts.createAreaChart('parentChartAttendance', {
+                    labels: attLabels,
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: attData,
+                        color: '#8B5CF6',
+                        backgroundColor: '#8B5CF618',
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+
+            var feeLabels = @json($chartData['fee_labels'] ?? []);
+            var feeData = @json($chartData['fee_data'] ?? []);
+            if (feeLabels.length && feeData.some(function(v) { return v > 0; })) {
+                window.SkulCharts.createDoughnutChart('parentChartFees', {
+                    labels: feeLabels,
+                    data: feeData,
+                    colors: ['#10B981', '#F59E0B'],
+                });
+            }
+
+            var childLabels = @json($chartData['results_child_labels'] ?? []);
+            var childData = @json($chartData['results_child_data'] ?? []);
+            if (childLabels.length) {
+                window.SkulCharts.createBarChart('parentChartResults', {
+                    labels: childLabels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: childData,
+                        backgroundColor: '#10B981',
+                        borderRadius: 6,
+                    }],
+                    options: {
+                        scales: {
+                            y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; } } },
+                        },
+                    },
+                });
+            }
+        }
+        if (!window.SkulCharts) { window.__skulChartsQueue.push(init); return; }
+        init();
+    })();
+</script>
+@endpush
 @endsection

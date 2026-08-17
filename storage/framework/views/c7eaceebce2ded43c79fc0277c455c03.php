@@ -1158,6 +1158,7 @@
         })();
     </script>
 
+    <script>window.__skulChartsQueue = window.__skulChartsQueue || [];</script>
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 

@@ -82,7 +82,7 @@
                         <form method="POST" action="<?php echo e(route('pending-schools.approve', $school)); ?>">
                             <?php echo csrf_field(); ?>
                             <button type="submit" class="sb-btn sb-btn-outline-success" style="width: 100%;"
-                                    onclick="return confirm('Are you sure you want to approve this school? A 30-day trial will be activated.')">
+                                    onclick="return confirm('Are you sure you want to approve this school? A <?php echo e($plan->trial_days ?? 30); ?>-day trial on <?php echo e($plan->name ?? 'selected plan'); ?> will be activated.')">
                                 Approve Registration
                             </button>
                         </form>
@@ -107,8 +107,14 @@
                     </div>
                     <div class="mb-2">
                         <span class="text-muted" style="font-size: 13px;">Plan:</span>
-                        <span style="font-weight: 500;"><?php echo e($school->name); ?></span>
+                        <span style="font-weight: 500;"><?php echo e($plan->name ?? 'Not selected'); ?></span>
                     </div>
+                    <?php if($plan): ?>
+                    <div class="mb-2">
+                        <span class="text-muted" style="font-size: 13px;">Trial:</span>
+                        <span><?php echo e($plan->trial_days); ?> days</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

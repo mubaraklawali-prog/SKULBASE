@@ -319,7 +319,7 @@ it('rejects reset with invalid token', function (): void {
 
 // ── School Admin Approval Force Password Change ──────
 
-it('sets force_password_change when school admin is approved', function (): void {
+it('does not set force_password_change when school admin is approved', function (): void {
     $school = School::create([
         'name' => 'Pending School',
         'slug' => 'pending-school',
@@ -332,7 +332,7 @@ it('sets force_password_change when school admin is approved', function (): void
     $admin = User::create([
         'name' => 'Pending Admin',
         'email' => 'pending_admin@test.com',
-        'password' => bcrypt('password'),
+        'password' => bcrypt('School12'),
     ]);
     $admin->forceFill(['role' => 'school_admin', 'school_id' => $school->id])->save();
 
@@ -340,10 +340,10 @@ it('sets force_password_change when school admin is approved', function (): void
     $this->post(route('pending-schools.approve', $school));
 
     $admin->refresh();
-    $this->assertTrue($admin->force_password_change);
+    $this->assertFalse($admin->force_password_change);
 });
 
-it('approved school admin redirected to change password on login', function (): void {
+it('approved school admin goes straight to dashboard on login', function (): void {
     $school = School::create([
         'name' => 'Pending School',
         'slug' => 'pending-school-2',
@@ -356,7 +356,7 @@ it('approved school admin redirected to change password on login', function (): 
     $admin = User::create([
         'name' => 'Pending Admin 2',
         'email' => 'pending_admin2@test.com',
-        'password' => bcrypt('password'),
+        'password' => bcrypt('School12'),
     ]);
     $admin->forceFill(['role' => 'school_admin', 'school_id' => $school->id])->save();
 
@@ -368,15 +368,15 @@ it('approved school admin redirected to change password on login', function (): 
 
     $response = $this->post(route('login'), [
         'email' => 'pending_admin2@test.com',
-        'password' => 'password',
+        'password' => 'School12',
     ]);
 
-    $response->assertRedirect(route('password.change'));
+    $response->assertRedirect(route('dashboard'));
 });
 
 // ── Full First Login Flow for All Roles ──────────────
 
-it('school admin first login flow: login -> change password -> dashboard', function (): void {
+it('school admin first login flow: approved school admin goes straight to dashboard', function (): void {
     $this->actingAs($this->superAdmin);
 
     $school = School::create([
@@ -391,33 +391,23 @@ it('school admin first login flow: login -> change password -> dashboard', funct
     $admin = User::create([
         'name' => 'Flow Admin',
         'email' => 'flow_admin@test.com',
-        'password' => bcrypt('password'),
+        'password' => bcrypt('School12'),
     ]);
     $admin->forceFill(['role' => 'school_admin', 'school_id' => $school->id])->save();
 
     $this->post(route('pending-schools.approve', $school));
 
     $admin->refresh();
-    $this->assertTrue($admin->force_password_change);
+    $this->assertFalse($admin->force_password_change);
 
     Auth::logout();
 
     $response = $this->post(route('login'), [
         'email' => 'flow_admin@test.com',
-        'password' => 'password',
-    ]);
-    $response->assertRedirect(route('password.change'));
-
-    $response = $this->actingAs($admin)->post(route('password.change.submit'), [
-        'current_password' => 'password',
-        'password' => 'NewStrongPass1',
-        'password_confirmation' => 'NewStrongPass1',
+        'password' => 'School12',
     ]);
     $response->assertRedirect(route('dashboard'));
-
-    $admin->refresh();
-    $this->assertFalse($admin->force_password_change);
-    $this->assertTrue(Hash::check('NewStrongPass1', $admin->password));
+    $this->assertAuthenticatedAs($admin->fresh());
 });
 
 it('teacher first login flow: login -> change password -> dashboard', function (): void {
@@ -743,7 +733,7 @@ it('does not reveal whether email exists on forgot password request', function (
 it('resets password for all roles via forgot password flow end-to-end', function (): void {
     $roles = [
         ['name' => 'Super Admin', 'email' => 'super_pass_reset@test.com', 'role' => 'super_admin', 'school_id' => null, 'redirect' => route('dashboard')],
-        ['name' => 'School Admin', 'email' => 'school_pass_reset@test.com', 'role' => 'school_admin', 'school_id' => $this->school->id, 'redirect' => route('password.change')],
+        ['name' => 'School Admin', 'email' => 'school_pass_reset@test.com', 'role' => 'school_admin', 'school_id' => $this->school->id, 'redirect' => route('dashboard')],
         ['name' => 'Teacher', 'email' => 'teacher_pass_reset@test.com', 'role' => 'teacher', 'school_id' => $this->school->id, 'redirect' => route('dashboard')],
         ['name' => 'Parent', 'email' => 'parent_pass_reset@test.com', 'role' => 'parent', 'school_id' => $this->school->id, 'redirect' => route('parent.dashboard')],
     ];
@@ -804,4 +794,52 @@ it('validates password confirmation on reset', function (): void {
 
     $response->assertSessionHasErrors('password');
     $this->assertTrue(Hash::check('password', $this->schoolAdmin->fresh()->password));
+});
+
+// ── Password Space Validation ─────────────────────────
+
+it('rejects password containing spaces on register', function (): void {
+    $response = $this->post(route('register'), [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'password' => 'No Spaces1',
+        'password_confirmation' => 'No Spaces1',
+    ]);
+
+    $response->assertSessionHasErrors('password');
+});
+
+it('rejects password with spaces on change password', function (): void {
+    $user = User::create([
+        'name' => 'Teacher User',
+        'email' => 'teacher@test.com',
+        'password' => bcrypt('OldPass123'),
+    ]);
+    $user->forceFill([
+        'role' => 'teacher',
+        'school_id' => $this->school->id,
+        'force_password_change' => true,
+    ])->save();
+
+    $response = $this->actingAs($user)->post(route('password.change.submit'), [
+        'current_password' => 'OldPass123',
+        'password' => 'New Password1',
+        'password_confirmation' => 'New Password1',
+    ]);
+
+    $response->assertSessionHasErrors('password');
+});
+
+it('accepts password with symbols', function (): void {
+    $response = $this->post(route('register'), [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+        'password' => 'Test@Pass1',
+        'password_confirmation' => 'Test@Pass1',
+    ]);
+
+    $response->assertRedirect(route('dashboard'));
+
+    $user = User::where('email', 'test@example.com')->first();
+    expect($user)->not->toBeNull();
 });

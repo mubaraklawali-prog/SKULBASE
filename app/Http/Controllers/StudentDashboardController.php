@@ -7,6 +7,7 @@ use App\Models\Assignment;
 use App\Models\Attendance;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
+use App\Models\StudentResult;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -61,6 +62,57 @@ class StudentDashboardController extends Controller
             ->latest()
             ->first();
 
+        $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+
+        $attendanceTrend = Attendance::where('student_id', $student->id)
+            ->where('school_id', $student->school_id)
+            ->where('attendance_date', '>=', $sixMonthsAgo)
+            ->orderBy('attendance_date')
+            ->get()
+            ->groupBy(fn ($a) => $a->attendance_date->format('M Y'))
+            ->map(function ($group) {
+                $total = $group->count();
+                $present = $group->whereIn('status', ['present', 'late', 'excused'])->count();
+
+                return $total > 0 ? round(($present / $total) * 100, 1) : 0;
+            })
+            ->toArray();
+
+        $scorePerformance = StudentResult::where('student_id', $student->id)
+            ->where('school_id', $student->school_id)
+            ->with('subject')
+            ->latest('id')
+            ->get()
+            ->groupBy('subject_id')
+            ->map(function ($group) {
+                return [
+                    'subject' => $group->first()->subject->name ?? 'Unknown',
+                    'average' => round($group->avg('score'), 1),
+                ];
+            })
+            ->values();
+
+        $totalAssignments = Assignment::where('class_id', $student->school_class_id)
+            ->where('school_id', $student->school_id)
+            ->count();
+
+        $overdueAssignments = Assignment::where('class_id', $student->school_class_id)
+            ->where('school_id', $student->school_id)
+            ->where('due_date', '<', Carbon::today())
+            ->count();
+
+        $upcomingCount = $upcomingAssignments->count();
+        $completedCount = max(0, $totalAssignments - $overdueAssignments - $upcomingCount);
+
+        $chartData = [
+            'attendance_trend_labels' => array_keys($attendanceTrend),
+            'attendance_trend_data' => array_values($attendanceTrend),
+            'score_subject_labels' => $scorePerformance->pluck('subject')->toArray(),
+            'score_subject_data' => $scorePerformance->pluck('average')->toArray(),
+            'assignment_labels' => ['Upcoming', 'Overdue', 'Completed'],
+            'assignment_data' => [$upcomingCount, $overdueAssignments, $completedCount],
+        ];
+
         return view('student.dashboard', compact(
             'student',
             'rate',
@@ -71,6 +123,7 @@ class StudentDashboardController extends Controller
             'upcomingAssignments',
             'recentResults',
             'latestReportCard',
+            'chartData',
         ));
     }
 }

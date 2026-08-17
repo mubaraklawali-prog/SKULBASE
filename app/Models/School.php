@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -24,11 +25,13 @@ class School extends Model
         'country',
         'principal_name',
         'is_active',
+        'affiliate_id',
         'registration_status',
         'registered_at',
         'approved_at',
         'rejected_at',
         'rejection_reason',
+        'selected_plan_id',
     ];
 
     protected $casts = [
@@ -193,5 +196,20 @@ class School extends Model
         return $this->hasOne(Subscription::class)
             ->whereIn('status', ['trial', 'active', 'grace'])
             ->latest();
+    }
+
+    public function affiliate(): BelongsTo
+    {
+        return $this->belongsTo(Affiliate::class);
+    }
+
+    public function selectedPlan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class, 'selected_plan_id');
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(Referral::class);
     }
 }
