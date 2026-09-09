@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>@yield('title', 'Skulbase')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#150a3d">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <style>
         /* ── Layout Shell ─────────────────────────────── */
         html, body {
@@ -1155,6 +1158,11 @@
 
     <script>window.__skulChartsQueue = window.__skulChartsQueue || [];</script>
     @stack('scripts')
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
 </body>
 
 </html>

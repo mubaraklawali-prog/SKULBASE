@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Skulbase — Run your school from one dashboard</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#150a3d">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1161,6 +1164,17 @@
             flex-direction: column;
             gap: 14px;
             color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-embed {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
         }
 
         .play-btn {
@@ -1540,8 +1554,10 @@
             </div>
             <div class="demo-frame">
                 <div class="demo-inner">
-                    <div class="play-btn">▶</div>
-                    <p>Watch the 90-second demo · captions on</p>
+                    <iframe class="demo-embed" src="https://www.youtube.com/embed/yb5ZrknkvX0?cc_load_policy=0"
+                        title="Skulbase demo video"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
                 </div>
             </div>
         </div>
@@ -1643,6 +1659,11 @@
                 toggle.setAttribute('aria-expanded', 'false');
             });
         });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
     </script>
 </body>
 
